@@ -1,0 +1,114 @@
+<include file="Public:header" />
+<h3><{$tname}>修改</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/editDaily" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:600px;">
+        <tr>
+            <th colspan="2">基本数据</th>
+        </tr>
+        <tr>
+            <td>单 号<em>*</em></td>
+            <td class="tf"><input type="text" style="width:250px;" name="num" value="<{$num}>" /></td>
+        </tr>
+        <tr>
+            <td>日 期</td>
+            <td class="tf"><input type="text" style="width:150px;" name="time" readonly="readonly" value="<{$time|date='Y-m-d', ###}>" onclick="showdatebox(this,'')" /></td>
+        </tr>
+        <!--
+        <tr>
+            <td>方 式<em>*</em></td>
+            <td class="tf">
+                <select id="way" name="way" onchange="showBank()">
+                    <option value="0" <eq name="way" value="0">selected="selected"</eq>>现金</option>
+                    <option value="1" <eq name="way" value="1">selected="selected"</eq>>银行</option>
+                </select>
+            </td>
+        </tr>
+        <tr id="bank" style="display:none;">
+            <td>银 行</td>
+            <td class="tf">
+                <select name="bank">
+                    <option>-请选择-</option>
+                    <iterate name="banks" id="vo">
+                        <option value="<{$vo['id']}>" <eq name="bank" value="$vo['id']">selected</eq>><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+        -->
+        <tr>
+            <td>员工/经办人</td>
+            <td class="tf">
+                <select name="user">
+                    <iterate name="users" id="vo">
+                        <option value="<{$vo['uid']}>" <eq name="user" value="$vo['uid']">selected="selected"</eq>><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>日 期</td>
+            <td class="tf"><input type="text" style="width:150px;" name="time" readonly="readonly" value="<{$time|date='Y-m-d', ###}>" onclick="showdatebox(this,'')" /></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <?php foreach ($price as $k=>$v){?>
+                        <tr>
+                            <td style="border-right:0px; text-align:left; line-height:30px;">
+                                科目:
+                                <select name="subject[]" style="width:250px;">
+                                    <option value="0">-请选择-</option>
+                                    <iterate name="subjects" id="vo">
+                                        <option value="<{$vo['id']}>" title="<{$vo['name']}>" <eq name="subject[$k]" value="$vo['id']">selected="selected"</eq>><{$vo['name']}></option>
+                                    </iterate>
+                                </select>　
+                                <br /><br />
+                                收支:
+                                <select name="income[]" style="width:50px;">
+                                    <option value="1" <eq name="income[$k]" value="1">selected="selected"</eq>>收入</option>
+                                    <option value="2" <eq name="income[$k]" value="2">selected="selected"</eq>>支出</option>
+                                </select>　
+                                金额:<input type="text" style="width:70px;" name="price[]" value="<if condition='$price[$k] < 0'>-</if><{$price[$k]|showPrice}>" />　
+                                摘要:<input name="comment[]" style="width:175px;" value="<{$comment[$k]}>" />
+                            </td>
+                        </tr>
+                    <?php } ?>
+                    <tr>
+                        <td style="border:0px; text-align:left;"><a href="#" onclick="addOne(this)">再添加一个？</a></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" name="id" value="<{$id}>" />
+    <input type="hidden" name="type" value="<{$type}>" />
+    <input type="submit" class="button" value="保 存" />
+    <input type="button" class="button" onclick="history.go(-1);" value="返 回" />
+</form>
+
+<script type="text/javascript">
+function showBank()
+{
+    var way = $("#way").val();
+    if(way > 0){
+        $("#bank").show();
+    }else{
+        $("#bank").hide();
+    }
+}
+
+showBank();
+
+function addOne(obj)
+{
+    var clone = $(obj).parent().parent().prev().clone();
+    $(obj).parent().parent().before(clone);
+    $(obj).parent().parent().prev().find('input').each(function(x){
+        $(this).val('');
+    });
+}
+
+</script>
+<include file="Public:footer" />

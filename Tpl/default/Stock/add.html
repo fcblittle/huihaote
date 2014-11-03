@@ -1,0 +1,113 @@
+<include file="Public:header" />
+<h3>库存添加</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/add" method="post">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+        <tr>
+            <th colspan="2">入库信息</th>
+        </tr>
+        <tr>
+            <td width="100">产　品<em>*</em></td>
+            <td class="tf">
+                <input type="hidden" name="goods_name" id="goods_name" value="" />
+                <select id="goods_type">
+                </select>
+                <select name="goods" id="goods">
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>仓　库<em>*</em></td>
+            <td class="tf">
+                <select name="group">
+                    <volist name="group" id="vo">
+                    <option value="<{$vo['gid']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+                    </volist>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>数　量<em>*</em></td>
+            <td class="tf"><input type="text" style="width:200px;" name="num" onkeyup="changenum(this);" /> <span id="unit"></span></td>
+        </tr>
+        <tr>
+            <td>总 价 值<em>*</em></td>
+            <td class="tf">
+                <input type="text" style="width:200px;" id="price" name="price" /> <a href="javascript:showCalculator();">>计算器</a>
+                <div id="calculator" style="background:#EEE; padding:10px; margin:10px; display:none;">
+                    <input type="text" id="cprice" style="width:50px;" />（单价） * <input id="cnum" type="text" readonly="readonly" style="width:50px;" />（数量） <input type="button" value="计算" onclick="calculator()" />
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>记录日期<em>*</em></td>
+            <td class="tf"><input type="text" style="width:250px;" name="time" value="" readonly="readonly" onclick="showdatebox(this,'')" /></td>
+        </tr>
+        <tr>
+            <td>备　注</td>
+            <td class="tf"><textarea name="comment" style="width:250px;"></textarea></td>
+        </tr>
+    </table>
+    <input type="submit" class="button" value="保 存" />
+    <input type="button" class="button" onclick="history.go(-1);" value="返 回" />
+</form>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    ajax("__APP__/Goods/index", {type:1}, 'post', function(data){
+        if(data.status){
+            for(x in data.data.type){
+                var t = data.data.type[x];
+                $("#goods_type").append("<option value='"+t.id+"'>"+t.levelstr+t.name+"</option>");
+            }
+            $("#goods").append("<option value=''>请选择...</option>");
+            for(x in data.data.list){
+                var t = data.data.list[x];
+                $("#goods").append("<option key='"+t.unit+"' class="+t.name+" title='"+(t.price/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+            }
+        }else{
+            alert("查询失败，请重试！");
+        }
+    });
+
+    $("#goods_type").change(function(){
+        ajax("__APP__/Goods/index/type/"+$(this).val(), {type:$(this).val()}, 'post', function(data){
+            if(data.status){
+                $("#goods").html("");
+                $("#goods").append("<option key='' value=''>请选择...</option>");
+                for(x in data.data.list){
+                    var t = data.data.list[x];
+                    $("#goods").append("<option key='"+t.unit+"' class="+t.name+" title='"+(t.price/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+                }
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+    $("#goods").change(function(){
+        $("#unit").html($(this).children("option:selected").attr("key"));
+        $("#cprice").val($(this).children("option:selected").attr("title"));
+        $("#goods_name").val($(this).children("option:selected").attr('class'));
+    });
+});
+function showCalculator(){
+    $("#calculator").toggle();
+}
+function changenum(obj){
+    $("#cnum").val($(obj).val());
+}
+function calculator(){
+    if(isNaN(parseFloat($("#cnum").val())) || isNaN(parseFloat($("#cprice").val()))){
+        alert("单价与数量必须为数字！");
+        return;
+    }
+    
+    var cnum = parseFloat($("#cnum").val(), 10) * 1;
+    var cprice = Math.round(parseFloat($("#cprice").val(), 10) * 100);
+
+    $("#price").val(cnum * cprice / 100);
+}
+</script>
+<include file="Public:footer" />

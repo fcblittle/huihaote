@@ -1,0 +1,99 @@
+<include file="Public:header" />
+<h3>货品资料修改</h3>
+
+<form action="__URL__/edit" method="post" enctype="multipart/form-data">
+<table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+    <tr>
+        <th colspan="2">基本资料</th>
+    </tr>
+    <tr>
+        <td width="100">品 名</td>
+        <td class="tf"><input type="text" style="width:250px;" name="name" value="<{$name}>" /></td>
+    </tr>
+    <tr>
+        <td>编 号</td>
+        <td class="tf"><input type="text" style="width:250px;" name="num" value="<{$num}>" /></td>
+    </tr>
+    <tr>
+        <td>分 类</td>
+        <td class="tf">
+            <select name="type">
+                <sublist name="types" id="vo">
+                    <option value="<{$vo['id']}>" <eq name="vo['id']" value="$type">selected="selected"</eq> ><{$vo['levelstr']}> <{$vo['name']}></option>
+                </sublist>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>仓 库</td>
+        <td style="text-align:left;">
+            <select multiple="multiple" style="width:250px;" name="group[]">
+                <iterate name="groups" id="vo">
+                    <option value="<{$vo['gid']}>" <?php if(in_array($vo['gid'], $groupGood)){ echo 'selected="selected"'; }?>><{$vo['levelstr']}> <{$vo['name']}></option>
+                </iterate>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>型 号</td>
+        <td class="tf"><input type="text" style="width:250px;" name="model" value="<{$model}>" /></td>
+    </tr>
+    <tr>
+        <td>预售价格</td>
+        <td class="tf"><input type="text" style="width:250px;" name="price" value="<{$price|showPrice}>" /></td>
+    </tr>
+    <tr>
+        <td>采购价格</td>
+        <td class="tf"><input type="text" style="width:250px;" name="cost" value="<{$cost|showPrice}>" /></td>
+    </tr>
+    <tr>
+        <td>数量单位</td>
+        <td class="tf"><input type="text" style="width:250px;" name="unit" value="<{$unit}>" /></td>
+    </tr>
+    <present name="extend">
+    <tr>
+        <th colspan="2">扩展资料</th>
+    </tr>
+    <volist name="extend" id="vo">
+    <tr>
+         <td><{$vo['name']}></td>
+         <td class="tf">
+            <switch name="vo['type']">
+            <case value="text"><input type="text" style="width:250px;" name="info[]" value="<{$info[$key]}>" /></case>
+            <case value="textarea"><textarea name="info[]" style="width:350px; height:200px;"><{$info[$key]}></textarea></case>
+            <case value="file">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>">点击查看文件</a>
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" onchange="upload('<{$key}>', 'file', '__APP__/Public/ajaxUpload')" />
+                <else />
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" onchange="upload('<{$key}>', 'file', '__APP__/Public/ajaxUpload')" />
+                </neq>
+            </case>
+            <case value="pic">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>"><img src=".<{$info[$key]}>" /></a>
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'pic', '__APP__/Public/ajaxUpload')" />
+                <else />
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'pic', '__APP__/Public/ajaxUpload')" />
+                </neq>
+            </case>
+            </switch>
+         </td>
+    </tr>
+    </volist>
+    </present>
+</table>
+<input type="hidden" name="id" value="<{$id}>" />
+<input type="submit" class="button" value="保 存" />
+<input type="button" class="button" onclick="location.href='__URL__/index'" value="返 回" />
+</form>
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'});
+function changeInput(obj){
+    var hide = $(obj).parent().find("input:hidden");
+    var name = hide.attr("name");
+    hide.remove();
+    $(obj).parent().append('<input type="file" style="width:250px;" name="'+name+'" />');
+}
+</script>
+<include file="Public:footer" />

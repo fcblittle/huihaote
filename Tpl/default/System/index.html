@@ -1,0 +1,37 @@
+<include file="Public:header" />
+<h3>关键数据设置</h3>
+<form action="__URL__/index" method="post">
+<table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+    <tr>
+        <th colspan="2">系统配置</th>
+    </tr>
+    <tr>
+        <td width="100">访问IP管理</td>
+        <td class="tf">
+        <eq name="ip|count" value="0">
+            <p style="padding-bottom:5px;">
+            <input type="text" style="width:100px;" name="ipstart[]" value="" />
+            --
+            <input type="text" style="width:100px;" name="ipend[]" value="" />
+            </p>
+        <else />
+            <volist name="ip" id="vo">
+            <p style="padding-bottom:5px;">
+            <input type="text" style="width:100px;" name="ipstart[]" value="<{$vo[0]}>" />
+            --
+            <input type="text" style="width:100px;" name="ipend[]" value="<{$vo[1]}>" />
+            </p>
+            </volist>
+        </eq>
+        <a id="addip" style="display:block; text-align:right;" href="javascript:addip();">增加IP段</a>
+        </td>
+    </tr>
+</table>
+<input type="submit" class="button" value="保 存" />
+</form>
+<script type="text/javascript">
+function addip(){
+    $("#addip").before('<p style="padding-bottom:5px;"><input type="text" style="width:100px;" name="ipstart[]" value="" /> -- <input type="text" style="width:100px;" name="ipend[]" value="" /></p>');
+}
+</script>
+<include file="Public:footer" />

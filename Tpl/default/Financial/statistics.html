@@ -1,0 +1,120 @@
+<include file="Public:header" />
+<h3>收支统计</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+
+<div style="padding:0px 10px 10px 0px; margin-bottom:10px; border-bottom:#CCC dashed 1px;">
+    <a href="__URL__/statistics/">收支合计</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/trend">收支走势</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/goods">产品收支统计</a>
+</div>
+
+<form action="__URL__/statistics/" style="padding-bottom:10px;">
+    来 源：
+        <select name="come" id="come" style="width:180px;">
+            <option value="1" <eq name="come" value="1">selected="selected"</eq>>全部</option>
+            <option value="order2" <eq name="come" value="order2">selected="selected"</eq>>销售出库</option>
+            <option value="order1" <eq name="come" value="order1">selected="selected"</eq>>采购入库</option>
+            <option value="service" <eq name="come" value="service">selected="selected"</eq>>维修管理</option>
+            <option value="daily" <eq name="come" value="daily">selected="selected"</eq>>日常支出</option>
+            <option value="worker" <eq name="come" value="worker">selected="selected"</eq>>员工费用</option>
+        </select>　　
+    时 间：
+    <input type="text" style="width:100px;" name="stime" readonly="readonly" onclick="showdatebox(this,'')" value="<{$stime}>" /> --
+    <input type="text" style="width:100px;" name="etime" readonly="readonly" onclick="showdatebox(this,'')" value="<{$etime}>" />
+
+    <input class="button" name="ac" type="submit" value="搜 索" />
+    <input class="button" name="ac" type="submit" value="导 出" />
+    <input class="button" name="ac" type="submit" value="打 印" />
+</form>
+
+<div style="height:30px; line-height:30px; padding-left:20px;">
+    期初余额: <{$begin|showPrice}>　
+    现金支出：<{$moneyexpense|showPrice}>　
+    银行支出：<{$bankexpense|showPrice}>　
+    现金收入：<{$moneyrevenue|showPrice}>　
+    银行收入：<{$bankrevenue|showPrice}>　
+    阶段总额：
+    <gt name="sum" value="0">
+        <span style="color:green"><{$sum|showPrice}></span>
+    <else />
+        <span style="color:red">-<{$sum|showPrice}></span>
+    </gt>　
+
+    结存余额:
+    <gt name="total" value="0">
+        <span style="color:green"><{$total|showPrice}></span>
+    <else />
+        <span style="color:red">-<{$total|showPrice}></span>
+    </gt>
+</div>
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>收支内容</th>
+        <th>收支金额</th>
+        <th>提成</th>
+        <th width="100">做账日期</th>
+        <th>到账情况</th>
+        <th width="100">做账人</th>
+        <th width="100">操作</th>
+    </tr>
+    <volist name="list" id="vo">
+        <tr>
+            <td><{$vo.name|text}></td>
+            <td>
+                <gt name="vo.price" value="0">
+                    <span style="color:green"><?php echo showPrice(abs($vo['price'])-abs($vo['notto'])); ?></span>
+                <else />
+                    <span style="color:red">-<?php echo showPrice(abs($vo['price'])-abs($vo['notto'])); ?></span>
+                </gt>
+            </td>
+            <td><{$vo.income|showPrice}></td>
+            <td><{$vo.time|date='Y-m-d',###}></td>
+            <td>
+                <eq name="vo.audit" value="0">
+                    <span style="color:red">未审核</span>
+                <else />
+                    <neq name="vo.notto" value="0">
+                        <span style="color:#000">
+                        <gt name="vo['price']" value="0">应收<else />应付</gt>：<{$vo.notto|showPrice}></span>
+                    <else />
+                        <span style="color:#CCC">已<gt name="vo.price" value="0">到帐<else />付清</gt></span>
+                    </neq>
+                </eq>
+            </td>
+            <td>
+                <present name="can_do['User']['view']">
+                    <a href="__APP__/User/view/id/<{$vo.uid}>"><{$vo['user']['name']}></a>
+                <else />
+                    <{$vo['user']['name']}>
+                </present>
+            </td>
+
+            <td>
+                <a href="__APP__<{$vo['url']}>">查看明细</a>
+                <!--
+                <present name="can_do['Financial']['edit']">&nbsp;┊&nbsp;<a href="__URL__/edit/id/<{$vo.id}>">修 改</a></present>
+                <present name="can_do['Financial']['delete']">&nbsp;┊&nbsp;<a href="__URL__/delete/id/<{$vo.id}>">删 除</a></present>
+                <eq name="vo.audit" value="0"><present name="can_do['Financial']['audit']">&nbsp;┊&nbsp;<a href="javascript:audit(<{$vo.id}>)">审 核</a></present></eq>
+                &nbsp;┊&nbsp;
+                -->
+            </td>
+
+        </tr>
+    </volist>
+    <tr>
+        <td colspan="7" style="text-align:right;"><{$page}></td>
+    </tr>
+</table>
+<script type="text/javascript">
+function getSum()
+{
+    var st = parseInt($("#st").val());
+    if(!st)
+        st = 0;
+    var su = $("#sum").val();
+    $("#total").html('￥'+(st*100+parseInt(su))/100);
+}
+</script>
+
+<include file="Public:footer" />

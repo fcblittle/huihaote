@@ -1,0 +1,52 @@
+<include file="Public:header" />
+<h3>供应商查看</h3>
+<table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+    <tr>
+        <th colspan="2">基本资料</th>
+    </tr>
+    <tr>
+        <td width="150">供应商名</td>
+        <td class="tf"><{$name}></td>
+    </tr>
+    <tr>
+        <td>分 类</td>
+        <td class="tf">
+            <select name="type">
+                <sublist name="types" id="vo">
+                    <option value="<{$vo['id']}>" <eq name="vo['id']" value="$type">selected="selected"</eq> ><{$vo['levelstr']}> <{$vo['name']}></option>
+                </sublist>
+            </select>
+        </td>
+    </tr>
+    <present name="extend">
+    <tr>
+        <th colspan="2">扩展资料</th>
+    </tr>
+    <volist name="extend" id="vo" enctype="multipart/form-data">
+    <tr>
+         <td><{$vo['name']}></td>
+         <td class="tf">
+            <switch name="vo['type']">
+            <case value="text"><{$info[$key]|html}></case>
+            <case value="textarea"><{$info[$key]|text}></case>
+            <case value="file">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>">点击查看文件</a>
+                <else />
+                </neq>
+            </case>
+            <case value="pic">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>"><img src=".<{$info[$key]}>" /></a>
+                <else />
+                    <span class="img"><img src="../Public/Images/noimage.gif" /></span>
+                </neq>
+            </case>
+            </switch>
+         </td>
+    </tr>
+    </volist>
+    </present>
+</table>
+<input type="button" class="button" onclick="location.href='__URL__/index'" value="返 回" />
+<include file="Public:footer" />

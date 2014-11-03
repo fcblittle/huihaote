@@ -1,0 +1,145 @@
+<include file="Public:header" />
+<h3>库存出入记录<span><present name="can_do['Stock']['audit']">(点击未确认状态可进行确认审核)</present></span></h3>
+
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/index/" style="margin-bottom:10px;" >
+<select name="gid">
+    <sublist name="group" id="vo">
+        <option value="<{$vo['gid']}>" <eq name="vo['gid']" value="$gid">selected="selected"</eq> ><{$vo['levelstr']}> <{$vo['name']}></option>
+    </sublist>
+</select>
+货物类型：<select name="goods_type" class="goods_type"></select>
+货 品：<select name="goods" class="goods"></select>
+日 期：<input type="text" style="width:100px;" name="stime" onclick="showdatebox(this,'')" /> --
+<input type="text" style="width:100px;" name="etime" onclick="showdatebox(this,'')" />
+类 型：
+<select name="type">
+    <option value="all">全部</option>
+    <option value="out" <eq name="type" value="out">selected="selected"</eq> >出库记录</option>
+    <option value="in" <eq name="type" value="in">selected="selected"</eq> >入库记录</option>
+</select>
+
+<input type="submit" value="查 询" />
+
+</form>
+
+<style type="text/css">
+.cl{ display:block; #padding-left:30%; #text-align:left;text-align:center; }
+</style>
+
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>备注</th>
+        <th>产品名称</th>
+        <th width="70">数 量</th>
+        <th width="100">出入库时间</th>
+        <!--th width="100">价 值</th>
+        <th width="100">应收/付</th-->
+        <th width="80">登 记 人</th>
+        <th width="50">状 态</th>
+        <th width="180">操 作</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><{$vo['comment']}></td>
+        <td>
+            <span class="cl">
+                <present name="can_do['Goods']['view']">
+                    <a href="__APP__/Goods/view/id/<{$vo.goods}>"><{$vo.goods_name}></a>
+                <else />
+                    <{$vo.goods_name}>
+                </present>
+                (<{$vo['good']['model']}>)
+            </span>
+        </td>
+        <td><{$vo.num}></td>
+        <td><{$vo.time|date='Y-m-d',###}></td>
+        <!--td><{$vo.price|showPrice}></td>
+        <td><?php $owe = abs($vo['price'])-abs($vo['money']); echo ($owe>=0 ? '' : '-').showPrice($owe); ?></td-->
+        <td>
+            <present name="can_do['User']['view']">
+                <a href="__APP__/User/view/id/<{$vo.uid}>"><{$vo['user']['name']}></a>
+            <else />
+                <{$vo['user']['name']}>
+            </present>
+        </td>
+        <td width="50">
+            <eq name="vo.audit" value="0">
+                <present name="can_do['Stock']['audit']">
+                <a style="color:red" href="javascript:audit(<{$vo.id}>)">未确认</a>
+                <else />
+                <span style="color:red">未确认</span>
+                </present>
+            <else />
+            <span style="color:#CCC">已确认</span>
+            </eq>
+        </td>
+        <td>
+            <eq name="can_manage" value="1">
+            <present name="can_do['Stock']['view']">&nbsp;┊&nbsp;<a href="__URL__/view/id/<{$vo.id}>">查 看</a></present>
+            <present name="can_do['Stock']['edit']">&nbsp;┊&nbsp;<a href="__URL__/edit/id/<{$vo.id}>">修 改</a></present>
+            <present name="can_do['Stock']['delete']">&nbsp;┊&nbsp;<a href="__URL__/delete/id/<{$vo.id}>">删 除</a></present>
+            &nbsp;┊&nbsp;
+            </eq>
+        </td>
+    </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="7" class="tr"><{$page}></td>
+    </tr>
+</table>
+<present name="can_do['Stock']['add']"><input type="button" class="button" onclick="location.href='__URL__/add/'" value="添 加" /></present>&nbsp;&nbsp;
+<!---<present name="can_do['Stock']['audit']"><input type="button" class="button" onclick="location.href='__URL__/audit/'" value="全部审核" /></present>-->
+<script type="text/javascript">
+function audit(id){
+    if(window.confirm("该记录货品已按数量进/出仓库，是否确认？")){
+        location.href='__URL__/audit/id/'+id;
+    }
+}
+$(document).ready(function(){
+    ajax("__APP__/Goods/index", {type:1}, 'post', function(data){
+        if(data.status){
+            var select = '';
+            for(x in data.data.type){
+                var t = data.data.type[x];
+                select = (t.id == '<?php echo (int)$_GET['goods_type']; ?>') ? 'selected="selected"' : '';
+                $(".goods_type").append("<option value='"+t.id+"' "+select+">"+t.levelstr+t.name+"</option>");
+            }
+            $(".goods").append("<option value=''>请选择...</option>");
+            for(x in data.data.list){
+                var t = data.data.list[x];
+                select = (t.id == '<?php echo (int)$_GET['goods']; ?>') ? 'selected="selected"' : '';
+                $(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"' "+select+">"+t.name+'('+t.model+')'+"</option>");
+            }
+        }else{
+            alert("查询失败，请重试！");
+        }
+    });
+
+    $(".goods_type").change(function(){
+        var obj = $(this);
+        ajax("__APP__/Goods/index/type/"+$(this).val(), {type:$(this).val()}, 'post', function(data){
+            if(data.status){
+                obj.nextAll(".goods").html("");
+                obj.nextAll(".goods").append("<option key='' value=''>请选择...</option>");
+                for(x in data.data.list){
+                    var t = data.data.list[x];
+                    obj.nextAll(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+                }
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+    $(".goods").change(function(){
+        $(this).siblings(".unit").html($(this).children("option:selected").attr("key"));
+        $(this).siblings(".cprice").val($(this).children("option:selected").attr("title"));
+        $(this).siblings(".goods_name").val($(this).children("option:selected").html());
+    });
+
+
+});
+</script>
+<include file="Public:footer" />

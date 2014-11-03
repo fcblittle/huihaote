@@ -1,0 +1,11 @@
+<include file="Public:header" />
+<h3>通知详情</h3>
+
+<div style="width:700px; margin:0 auto; background:#FFF; min-height:600px; height:auto!important; height:600px; border:#CCC solid 1px;">
+    <div style="width:90%; padding:20px 5% 5px 5%; font-size:16px; font-weight:bold; text-align:center;"><{$title}></div>
+    <div style="width:80%; padding:5px 5%; margin:0px 5%; border-bottom:#CCC dashed 1px; text-align:right; color:#999;"><{$time|timestr}></div>
+    <div style="width:90%; padding:10px 5%;"><{$content|text}></div>
+    <div style="width:90%; padding:10px 5%; text-align:right;"><a style="color:#CCC;" href="__URL__/inform/"><< 返回列表</a></div>
+</div>
+
+<include file="Public:footer" />

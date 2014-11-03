@@ -1,0 +1,92 @@
+<include file="Public:header" />
+<h3>财务统计</h3>
+<script type="text/javascript" src="../Public/JS/excanvas.pack.js"></script>
+<script type="text/javascript" src="../Public/JS/flot.js"></script>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+
+<div style="padding:0px 10px 10px 0px; margin-bottom:10px; border-bottom:#CCC dashed 1px;">
+    <a href="__URL__/statistics/">收支合计</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/trend">收支走势</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/goods">产品收支统计</a>
+</div>
+
+<form action="__URL__/statistics/type/trend">
+
+时 间：
+<input type="text" style="width:100px;" name="stime" readonly="readonly" onclick="showdatebox(this,'')" value="<{$stime}>" /> --
+<input type="text" style="width:100px;" name="etime" readonly="readonly" onclick="showdatebox(this,'')" value="<{$etime}>" />
+
+<input type="submit" value="查 询" />
+
+</form>
+
+<style type="text/css">
+#content #testbox table{width:auto; background:#FFF; border:#CCC solid 1px;}
+</style>
+
+<div id="testbox" style="width:700px; height:400px; margin-top:10px; float:left;"></div>
+
+<script type="text/javascript">
+function analyze(data){
+    var json = eval("("+data+")");
+    var i = 0;
+    var data = new Array();
+    data['revenue'] = new Array();
+    data['expense'] = new Array();
+    data['sum'] = new Array();
+    var anticks = new Array();
+    anticks[0] = [0,0];
+    for(x in json){
+        i ++;
+        data['revenue'][i] = [i, json[x]['revenue']];
+        data['expense'][i] = [i, json[x]['expense']];
+        data['sum'][i] = [i, json[x]['sum']];
+        anticks[i] = [i, json[x]['date']];
+    }
+    var andata = [];
+    andata[0] = {data:data['revenue'],  lines:{show:true}, point:{show:true}, label: "收入额", color:"#FF8800", shadowSize:0};
+    andata[1] = {data:data['expense'], lines:{show:true}, point:{show:true}, label: "支出额", color:"#88FF00", shadowSize:0};
+    andata[2] = {data:data['sum'], lines:{show:true}, point:{show:true}, label: "日总额", color:"#CCCCCC", shadowSize:0};
+    $.plot($("#testbox"), andata,
+    {
+        grid: {hoverable: true},
+        selection:{mode: "xy"},
+        xaxis:{ticks:anticks, labelWidth:10},
+        yaxis:{tickDecimals:0, autoscaleMargin:0.3},
+        legend:{backgroundOpacity:0.5}
+    });
+}
+analyze('<{$json}>');
+
+function showTooltip(x, y, contents) {
+	$('<div id="tooltip">' + contents + '</div>').css( {
+		position: 'absolute',
+		display: 'none',
+		top: y + 5,
+		left: x + 5,
+		border: '1px solid #333',
+		padding: '2px','background-color': '#FFF',
+		opacity: 0.80
+	}).appendTo("body").fadeIn(200);
+}
+
+var previousPoint = null;
+$("#testbox").bind("plothover", function (event, pos, item) {
+	if (item) {
+		if (previousPoint != item.datapoint) {
+			previousPoint = item.datapoint;
+			$("#tooltip").remove();
+			var y = item.datapoint[1];
+            var x = item.series.xaxis.ticks[item.datapoint[0]]['label'];
+			showTooltip(item.pageX, item.pageY, x+"日为" + y + "<{$unit}>");
+		}
+	}else {
+		$("#tooltip").remove();
+		previousPoint = null;
+	}
+});
+
+
+</script>
+<include file="Public:footer" />

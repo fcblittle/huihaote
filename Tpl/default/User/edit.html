@@ -1,0 +1,111 @@
+<include file="Public:header" />
+<h3>人员资料修改<span>(修改用户资料，鼠标悬停将有部分提示。)</span></h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/edit" method="post" enctype="multipart/form-data">
+<table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+    <tr>
+        <th colspan="2">基本资料</th>
+    </tr>
+    <tr>
+        <td width="100">用户名</td>
+        <td class="tf"><input type="text" style="width:250px;" name="username" value="<{$username}>" /><input type="hidden" name="id" value="<{$uid}>" /></td>
+    </tr>
+    <tr title="留空则不修改密码">
+        <td>新密码</td>
+        <td class="tf"><input type="password" style="width:250px;" name="password" /></td>
+    </tr>
+    <tr>
+        <td>确认密码</td>
+        <td class="tf"><input type="password" style="width:250px;" name="passwordcheck" /></td>
+    </tr>
+    <tr>
+        <td>姓 名</td>
+        <td class="tf"><input type="text" style="width:250px;" name="name" readonly="readonly" value="<{$name}>" /></td>
+    </tr>
+    <tr title="用于快捷查询用户的职工号或身份证号码等。">
+        <td>编 号</td>
+        <td class="tf"><input type="text" style="width:250px;" name="num" value="<{$num}>" /></td>
+    </tr>
+    <tr>
+            <td>生日类型</td>
+            <td class="tf">
+                <select name="btype">
+                    <option value="阳历" <eq name="btype" value="阳历">selected="selected"</eq>>阳历</option>
+                    <option value="阴历" <eq name="btype" value="阴历">selected="selected"</eq>>阴历</option>
+                </select>
+            </td>
+        </tr>
+    <tr>
+        <td>生 日</td>
+        <td class="tf"><input type="text" style="width:250px;" name="birthday" value="<{$birthday}>" readonly="readonly" onclick="showdatebox(this,'')" /></td>
+    </tr>
+    <tr title="被锁定的用户将只能够由管理员进行资料修改。">
+        <td>锁 定</td>
+        <td class="tf">
+            <select name="lock">
+            <eq name="lock" value="1">
+                <option value="0">不锁定</option>
+                <option value="1" selected="selected">锁定</option>
+            <else />
+                <option value="0" selected="selected">不锁定</option>
+                <option value="1">锁定</option>
+            </eq>
+            </select>
+        </td>
+    </tr>
+    <tr title="选择用户角色">
+        <td>角 色</td>
+        <td class="tf">
+            <select name="role[]" style="width:250px;" class="treeselect" multiple="multiple">
+                <volist name="role" id="vo">
+                <option value="<{$vo['id']}>" <eq name="vo['selected']" value="1">selected="selected"</eq> <eq name="vo['can']">style="color:#CCC;"</eq>><{$vo['levelstr']}> <{$vo['name']}></option>
+                </volist>
+            </select>
+        </td>
+    </tr>
+    <present name="extend">
+    <tr>
+        <th colspan="2">扩展资料</th>
+    </tr>
+    <volist name="extend" id="vo">
+    <tr>
+         <td><{$vo['name']}></td>
+         <td class="tf">
+            <switch name="vo['type']">
+            <case value="text"><input type="text" style="width:250px;" name="info[]" value="<{$info[$key]}>" /></case>
+            <case value="textarea"><textarea name="info[]" style="width:350px; height:200px;"><{$info[$key]}></textarea></case>
+            <case value="file">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>">点击查看文件</a>
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" onchange="upload('<{$key}>', 'file', '__APP__/Public/ajaxUpload')" />
+                <else />
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" onchange="upload('<{$key}>', 'file', '__APP__/Public/ajaxUpload')" />
+                </neq>
+            </case>
+            <case value="pic">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>"><img src=".<{$info[$key]}>" /></a>
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'pic', '__APP__/Public/ajaxUpload')" />
+                <else />
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'pic', '__APP__/Public/ajaxUpload')" />
+                </neq>
+            </case>
+            </switch>
+         </td>
+    </tr>
+    </volist>
+    </present>
+</table>
+<input type="submit" class="button" value="保 存" />
+</form>
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'});
+function changeInput(obj){
+    var hide = $(obj).parent().find("input:hidden");
+    var name = hide.attr("name");
+    hide.remove();
+    $(obj).parent().append('<input type="file" style="width:250px;" name="'+name+'" />');
+}
+</script>
+<include file="Public:footer" />

@@ -1,0 +1,48 @@
+<include file="Public:header" />
+<h3>我的<{$tname}>申请</h3>
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>单 号</th>
+        <th><eq name="abs" value="1">供应商<else />客 户</eq></th>
+        <th width="80">申请人</th>
+        <th width="120">申请时间</th>
+        <th width="80">状 态</th>
+        <th width="250">操 作</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><{$vo.num}></td>
+        <td><{$vo['cors']['name']}></td>
+        <td><{$vo['user']['name']}></td>
+        <td><{$vo.time|date='Y-m-d H:i',###}></td>
+        <td>
+            <gt name="vo['audit']" value="0">
+                <span style="color:green">审核通过</span>
+            <else />
+                <eq name="vo['audit']" value="0">
+                <span style="color:#CCC">待审核</span>
+                <else />
+                <span style="color:red">审核失败</span>
+                </eq>
+            </gt>
+        </td>
+        <td>
+            &nbsp;┊&nbsp; <a href="__URL__/view/id/<{$vo.id}>/url/add">查 看</a>
+            <elt name="vo['audit']" value="0">
+            &nbsp;┊&nbsp; <a href="__URL__/edit/id/<{$vo.id}>/url/add">修 改</a>
+            &nbsp;┊&nbsp; <a href="__URL__/delete/id/<{$vo.id}>/url/add">删 除</a>
+            <neq name="vo['audit']" value="0">
+            &nbsp;┊&nbsp; <a href="__URL__/add/id/<{$vo.id}>/url/add">重新提交</a>
+            </neq>
+            </elt>
+            &nbsp;┊&nbsp;
+        </td>
+    </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="6" class="tr"><{$page}></td>
+    </tr>
+</table>
+<input type="button" class="button" onclick="location.href='__URL__/add/do/1'" value="添 加" /> &nbsp;
+
+<include file="Public:footer" />

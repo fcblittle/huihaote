@@ -1,0 +1,73 @@
+<include file="Public:header" />
+<h3>库存<eq name="type" value="in">报溢<else />报损</eq></h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/inorde" method="post">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+        <tr>
+            <th colspan="2"><eq name="type" value="in">报溢<else />报损</eq>信息</th>
+        </tr>
+        <tr>
+            <td width="100">产　品<em>*</em></td>
+            <td class="tf">
+                <input type="hidden" name="goods_name" id="goods_name" value="<{$g['name']}>" />
+                <select name="goods" id="goods">
+                        <option value="">请选择...</option>
+                    <volist name="allgoods" id="vo">
+                        <option value="<{$vo['id']}>" key="<{$vo['unit']}>" title="<{$vo['price']/100}>" <eq name="vo['id']" value="$goods">selected="selected"</eq> ><{$vo['name']}>(<{$vo['model']}>)</option>
+                    </volist>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>仓　库<em>*</em></td>
+            <td class="tf">
+                <select name="group">
+                    <volist name="group" id="vo">
+                    <option value="<{$vo['gid']}>" <eq name="vo['gid']" value="$gid">selected="selected"</eq> ><{$vo['levelstr']}><{$vo['name']}></option>
+                    </volist>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>数　量<em>*</em></td>
+            <td class="tf"><input type="text" style="width:200px;" name="num" onkeyup="changenum(this);" /> <span id="unit"><{$g['unit']}></span></td>
+        </tr>
+        <tr>
+            <td>总 价 值<em>*</em></td>
+            <td class="tf">
+                <input type="text" style="width:200px;" id="price" name="price" /> <a href="javascript:showCalculator();">>计算器</a>
+                <div id="calculator" style="background:#EEE; padding:10px; margin:10px; display:none;">
+                    <input type="text" id="cprice" style="width:50px;" value="<{$g['price']/100}>" />（单价） * <input id="cnum" type="text" readonly="readonly" style="width:50px;" />（数量） <input type="button" value="计算" onclick="calculator()" />
+                </div>
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" name="type" value="<{$type}>" />
+    <input type="submit" class="button" value="保 存" />
+    <input type="button" class="button" onclick="location.href='__URL__/statistics'" value="返 回" />
+</form>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $("#goods").change(function(){
+        $("#unit").html($(this).children("option:selected").attr("key"));
+        $("#cprice").val($(this).children("option:selected").attr("title"));
+        $("#goods_name").val($(this).children("option:selected").html());
+    });
+});
+function showCalculator(){
+    $("#calculator").toggle();
+}
+function changenum(obj){
+    $("#cnum").val($(obj).val());
+}
+function calculator(){
+    if(isNaN(parseFloat($("#cnum").val())) || isNaN(parseFloat($("#cprice").val()))){
+        alert("单价与数量必须为数字！");
+        return;
+    }
+    $("#price").val(parseFloat($("#cnum").val()) * parseFloat($("#cprice").val()));
+}
+</script>
+<include file="Public:footer" />

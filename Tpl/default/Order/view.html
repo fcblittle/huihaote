@@ -1,0 +1,339 @@
+<include file="Public:header" />
+<h3><{$tname}>查看</h3>
+
+<form action="__URL__/audit" method="post">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">基本信息</th>
+        </tr>
+        <tr>
+            <td width="90">单 号</td>
+            <td class="tf"><{$num}></td>
+        </tr>
+        <neq name="mname" value="Wastage">
+        <tr>
+            <td><eq name="abs" value="1">供应商<else />客 户</eq></td>
+            <td class="tf">
+                <eq name="abs" value="1">
+                    <present name="can_do['Supplier']['view']"><a href="__APP__/Supplier/view/id/<{$cors['id']}>"><{$cors['name']}></a><else /><{$cors['name']}></present>
+                <else />
+                    <present name="can_do['Client']['view']"><a href="__APP__/Client/view/id/<{$cors['id']}>"><{$cors['name']}></a><else /><{$cors['name']}></present>
+                </eq>
+            </td>
+        </tr>
+        <!--
+        <tr>
+            <td width="90">方 式</td>
+            <td class="tf">
+                <eq name="way" value="1">
+                    <{$bank['name']}>(<{$bank['account']}>)
+                <else />
+                    现金
+                </eq>
+            </td>
+        </tr>
+        -->
+        <tr>
+            <td>货 品</td>
+            <td class="tf">
+                <volist name="goods" id="vo">
+                <div style="padding:5px;">
+                    <{$allgoods[$vo['goods']]['name']}>(<{$allgoods[$vo['goods']]['model']}>)<br />
+                    <div class="tr" style="color:#999; padding:5px 0px; border-bottom:#CCC dashed 1px;">
+                        数量：<{$vo['num']}><{$allgoods[$vo['goods']]['unit']}>
+                        <eq name="needprice" value="1">
+                            &nbsp; ┊ &nbsp;单价：<{$vo['price']|showPrice}>&nbsp; ┊ &nbsp;金额：<{$vo['total']|showPrice}>&nbsp; ┊ &nbsp;税率：<{$vo['tax']}>%&nbsp; ┊ &nbsp;税额：<{$vo['tax_total']|showPrice}><br />
+                            总金额：<{$vo['total']+$vo['tax_total']|showPrice}>
+                        </eq>
+                        <eq name="mname" value="Morder">&nbsp; ┊ &nbsp;总金额：<{$vo['total']|showPrice}>&nbsp; ┊ &nbsp;单价：<{$vo['price']|showPrice}></eq><br />
+                        备注：<{$vo['com']|html}>
+                    </div>
+                </div>
+                </volist>
+            </td>
+        </tr>
+        </neq>
+
+        <eq name="mname" value="Wastage">
+        <tr >
+        	<td >原材料</td>
+            <td class="tf">
+            <volist name="used" id="oo">
+            <div style="padding:10px 5px; line-height:22px; border-bottom:#666 dashed 1px; ">
+                <b style="font-size:14px;"><{$allgoods[$oo['goods']]['name']}>（<{$group[$oo['group']]['name']}>）</b><br />
+                　使用量：<{$oo['used']}> <{$allgoods[$oo['goods']]['unit']}><br />
+                　作废量：<{$oo['surplus']}> <{$allgoods[$oo['goods']]['unit']}><br />
+            </div>
+            </volist>
+            </td>
+        </tr>
+        </eq>
+
+        <gt name="audit" value="0">
+            <tr>
+                <th colspan="2">审核结果</th>
+            </tr>
+            <tr>
+                <td>发货方式</td>
+                <td class="tf"><{$express|text}></td>
+            </tr>
+            <tr>
+                <td>发货单号</td>
+                <td class="tf"><{$code|text}></td>
+            </tr>
+            <tr>
+                <td>备 注</td>
+                <td class="tf"><{$comment|text}></td>
+            </tr>
+            <tr>
+                <td>货品储存</td>
+                <td class="tf">
+                    <volist name="goods" id="vo">
+                    <div style="padding:5px; border-bottom:#CCC dashed 1px;">
+                        <{$allgoods[$vo['goods']]['name']}>(<{$allgoods[$vo['goods']]['model']}>)&nbsp; ┊ &nbsp;数量：<{$vo['num']}>
+                        <sublist name="vo['group']" id="so">
+                        <div class="vBox" style="padding:5px 5px; background:#EEE;">
+                            仓 库：<{$so['group']['name']}>&nbsp;
+                            数 量：<{$so['num']}>&nbsp;
+                            <eq name="so['audit']" value="0"><span style="color:red">未确认</span></eq>
+                        </div>
+                        </sublist>
+                    </div>
+                    </volist>
+                </td>
+            </tr>
+
+            <eq name="needprice" value="1">
+            <tr>
+                <td>财务入账</td>
+                <td class="tf">
+                    订单金额：<{$total+$tax_total|showPrice}><br />
+                    审核金额：<{$money['price']|showPrice}>
+                    <eq name="money['audit']" value="0">
+                        <span style="color:red"> 未确认</span>
+                    <else />
+                        <neq name="money['notto']" value="0">
+                            <br /><span style="color:red">欠 帐：<{$money['notto']|showPrice}></span>
+                        <else />
+                            <span style="color:#CCC"> 已结清</span>
+                        </neq>
+                    </eq>
+                </td>
+            </tr>
+            </eq>
+
+        <else />
+
+            <eq name="audit" value="0">
+            <present name="can_do[$mname]['audit']">
+            <tr>
+                <th colspan="2">审核信息</th>
+            </tr>
+            <tr>
+                <td>发货方式</td>
+                <td style="text-align:left;">
+                    <select name="express">
+                        <option value="自取">自取</option>
+                        <option value="发车">发车</option>
+                        <option value="增益 ">增益 </option>
+                        <option value="韵达">韵达</option>
+                        <option value="顺丰">顺丰</option>
+                        <option value="德邦">德邦</option>
+                        <option value="博达">博达</option>
+                        <option value="华宇">华宇</option>
+                        <option value="申通">申通</option>
+                        <option value="中通">中通</option>
+                        <option value="圆通">圆通</option>
+                        <option value="天天EMS">天天EMS</option>
+                        <option value="联邦">联邦</option>
+                        <option value="DHL">DHL</option>
+                        <option value="快捷">快捷</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>发货单号</td>
+                <td class="tf"><input name="code" style="width:100px;" value=""></td>
+            </tr>
+            <tr>
+                <td>备 注</td>
+                <td class="tf">
+                    <textarea name="comment" style="width:400px; height:60px;"><{$comment|text}></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>货品储存</td>
+                <td class="tf">
+                    <?php foreach($goods as $k=>$vo){?>
+                        <div style="padding:5px; border-bottom:#CCC dashed 1px;">
+                            <{$allgoods[$vo['goods']]['name']}>(<{$allgoods[$vo['goods']]['model']}>)&nbsp; ┊ &nbsp;数量：<{$vo['num']}>
+                            <input type="hidden" class="goods" value="<{$vo['goods']}>" />
+                            <input type="hidden" class="num" value="<{$vo['num']}>" />
+                            <div class="vBox" style="padding:10px 5px; background:#EEE;">
+                                仓 库：
+                                <select name="group[<{$k}>][]">
+                                    <volist name="group" id="go">
+                                    <option value="<{$go['gid']}>"><{$go['levelstr']}><{$go['name']}></option>
+                                    </volist>
+                                </select>&nbsp;
+                                数 量：<input type="text" style="width:50px;" name="num[<{$k}>][]" value='<{$vo["num"]}>' />
+                            </div>
+                            <div class="tr" style="padding:5px;"><a href="javascript:vol();" onclick="addGroup(this)">+添加仓库分配</a></div>
+                        </div>
+                    <?php } ?>
+                </td>
+            </tr>
+            <eq name="needprice" value="1">
+            <tr>
+                <td>财务收支</td>
+                <td class="tf"><input type="text" id="price" name="price" value="<?php echo showPrice($total+$tax_total); ?>" /></td>
+            </tr>
+                <?php if($mname == 'Sorder' || $mname == 'Service'){?>
+                    <tr>
+                        <td>类型</td>
+                        <td class="tf">
+                            <select name="sort" onchange="getPercent()" id="sort">
+                                <option value="0">请选择</option>
+                                <iterate name="percent" id="vo">
+                                    <option value="<{$vo['id']}>" title="<{$vo['value']}>" <eq name="sort" value="$vo['id']"> selected='selected'</eq>><{$vo['intro']}></option>
+                                </iterate>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>提成</td>
+                        <td class="tf">
+                            <input type="text" name="income" id="income" value="<{$income|showPrice}>" style="width:100px;" />
+                            比率：<span id="percent"></span>%
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>负责人</td>
+                        <td class="tf">
+                            <{$response['name']}>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </eq>
+            </present>
+            <else />
+            <tr>
+                <th colspan="2">审核状态</th>
+            </tr>
+            <tr>
+                <td>发货方式</td>
+                <td class="tf"><{$express|text}></td>
+            </tr>
+            <tr>
+                <td>发货单号</td>
+                <td class="tf"><{$code|text}></td>
+            </tr>
+            <tr>
+                <td>备 注</td>
+                <td class="tf"><{$comment|text}></td>
+            </tr>
+            <tr>
+                <td>状 态</td>
+                <td>未通过</td>
+            </tr>
+            </eq>
+        </gt>
+    </table>
+
+    <div style="width:500px;">
+        <div class="f">
+            <input type="button" class="button" onclick="history.go(-1);" value="返 回" />
+        </div>
+
+        <eq name="audit" value="0">
+            <present name="can_do[$mname]['audit']">
+            <div class="r">
+                <input type="hidden" name="id" value="<{$id}>">
+                <input type="submit" class="button" value="审核通过" />
+                <input type="button" class="button_red" onclick="location.href='__URL__/audit/refuse/<{$id}>'" value="审核拒绝" />
+            </div>
+            </present>
+        <else />
+
+            <div class="r">
+                <if condition="$audit gt 0">
+                    <present name="can_do[$mname]['printOrder']">
+                        <input type="button" class="button" onclick="location.href='__URL__/printOrder/id/<{$id}>'" value="打 印" />　
+                    </present>
+                </if>
+                <if condition="$audit lt 0">
+                    <input type="button" class="button_red" onclick="location.href='__URL__/edit/id/<{$id}>'" value="修 改" />
+                </if>
+            </div>
+
+        </eq>
+    </div>
+</form>
+
+<script type="text/javascript">
+var total = '<{$total+$tax_total}>';
+
+function getPercent()
+{
+    var sort = $("#sort").val();
+    var percent = $("#sort option:selected").attr('title');
+    if(sort > 0)
+    {
+        $("#percent").html(percent);
+        $("#income").val(parseInt(total, 10)*parseInt(percent, 10)/10000);
+    }
+}
+
+function addGroup(obj){
+    obj = $(obj).parent();
+    var clone = obj.prev("div").clone();
+    clone.children("input,select").val('');
+    obj.before(clone);
+}
+/*<eq name="abs" value="1">*/
+//入库数不超过订单
+$(".vBox input:text").keyup(function(){
+    var obj = $(this);
+    var sum = parseFloat(obj.parent().parent().children(".num").val());
+    var count = 0;
+    obj.parent().parent().find("input:text").each(function(i){
+        count += parseFloat($(this).val());
+    });
+    if(count > sum) {
+        alert("设定数量超过订单总数！");
+        obj.val(sum - (count - parseFloat($(this).val())));
+    }
+});
+
+/*<else />*/
+//出库数不超过库存
+$(".vBox input:text").keyup(function(){
+    var obj = $(this);
+    var group = $(this).prevAll("select:eq(0)").val();
+    var goods = parseInt(obj.parent().parent().children(".goods").val());
+    ajax("__APP__/Stock/getsum/", {group:group,goods:goods}, 'get', function(data){
+        if(data.status == 1){
+            if(parseFloat(data.data) < parseFloat(obj.val()) ){
+                alert("设定数量超过库存数目！");
+                obj.val(parseFloat(data.data));
+                return;
+            }
+        }else{
+            alert("读取仓库库存数据错误！");
+        }
+    });
+    var sum = parseFloat(obj.parent().parent().children(".num").val());
+    var count = 0;
+    obj.parent().parent().find("input:text").each(function(i){
+        count += parseFloat($(this).val());
+    });
+    if(count > sum) {
+        alert("设定数量超过订单总数！");
+        obj.val(sum - (count - parseFloat($(this).val())));
+        return;
+    }
+});
+
+/*</eq>*/
+</script>
+<include file="Public:footer" />

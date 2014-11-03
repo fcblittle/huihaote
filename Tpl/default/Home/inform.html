@@ -1,0 +1,25 @@
+<include file="Public:header" />
+<h3>通知列表</h3>
+
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>标题</th>
+        <th width="15%">发布时间</th>
+        <th width="200">操作</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><a href="__URL__/inform/view/<{$vo.id}>"><{$vo.title}></a></td>
+        <td><{$vo.time|timestr}></td>
+        <td>
+            &nbsp;┊&nbsp; <a href="__URL__/inform/delete/<{$vo.id}>">删 除</a>
+            &nbsp;┊&nbsp;
+        </td>
+    </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="3" class="tr"><{$page}></td>
+    </tr>
+</table>
+<input type="button" class="button" onclick="if(confirm('确定要删除全部？')) location.href='__URL__/inform/delete/all'" value="删除全部" />
+<include file="Public:footer" />

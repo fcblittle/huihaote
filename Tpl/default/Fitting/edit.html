@@ -1,0 +1,186 @@
+<include file="Public:header" />
+<h3><{$tname}>修改</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="<eq name='url' value='audit'>__URL__/audit/edit/<{$id}>/url/<{$url}><else />__URL__/edit/url/<{$url}></eq>" method="post">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">填写信息大大滴</th>
+        </tr>
+        <tr>
+            <td width="90">单 号</td>
+            <td class="tf"><input type="text" style="width:250px;" name="num" value="<{$num}>" /></td>
+        </tr>
+        <tr>
+            <td width="90">发送时间</td>
+            <td class="tf"><input type="text" style="width:250px;" name="time" value="<{$time|date='Y-m-d H:i',###}>" /></td>
+        </tr>
+
+        <tr >
+        	<td >原材料</td>
+            <td class="tf">
+            <volist name="used" id="so">
+                <div style="padding:10px 5px; border-bottom:#666 dashed 1px;">
+                    来 源：
+                    <select class="goods_type" style="width:150px;"></select>
+                    原 料：
+                    <select class="goods" name="material[goods][]" id="<{$so['goods']}>" style="width:300px;"></select>
+                    <br /><br />
+                    数 量：
+                    <input type="text" style="width:50px;" name="material[used][]" value="<{$so['used']}>" />
+                    <span class="unit"><{$allgoods[$so["goods"]]['unit']}></span>　
+                    <br /><br />
+                    备 注：<input type="text" style="width:200px;" name="material_com[]" value="<{$so['com']}>" />
+                </div>
+            </volist>
+                <div id="tempAdd2" class="tr" style="padding:5px;"><a href="javascript:addMaterial()">+添加原材料</a></div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>货 品</td>
+            <td class="tf">
+                <if condition="$goods">
+                    <volist name="goods" id="vo">
+                        <div style="padding:10px 5px; border-bottom:#666 dashed 1px;">
+                            货品类型：<select class="goods_type" style="width:150px;"></select>
+                            货品：<select name="goods[]" class="goods" id="<{$vo['goods']}>" style="width:300px;"></select>
+                            <span class="price"></span>
+                            <br /><br />
+                            数 量：<input type="text" class="num" style="width:50px;" name="goods_num[]" onkeyup="<eq name='needprice' value='1'>sumPrice(this)</eq>" value="<{$vo['num']}>" /> <span class="unit"><{$allgoods[$vo['goods']]['unit']}></span>
+                            <eq name="needprice" value="1">　　总 价：<input type="text" class="total" style="width:50px;" name="goods_price[]" value="<{$vo['price']/100}>" /></eq>
+                            <br /><br />
+                            备 注：<input type="text" style="width:200px;" name="goods_com[]" value="<{$vo['com']}>" />
+                        </div>
+                    </volist>
+                <else />
+                    <div style="padding:10px 5px; border-bottom:#666 dashed 1px;">
+                        货品类型：<select class="goods_type" style="width:150px;"></select>
+                        货品：<select name="goods[]" class="goods" style="width:300px;"></select>
+                        <br /><br />
+                        数 量：<input type="text" class="num" style="width:50px;" name="goods_num[]" onkeyup="<eq name='needprice' value='1'>sumPrice(this)</eq>" /> <span class="unit"></span>
+                        <eq name="needprice" value="1">　　总 价：<input class="total" type="text" style="width:100px;" name="goods_price[]" /> 元</eq>
+                        <br /><br />
+                        备 注：<input type="text" style="width:200px;" name="goods_com[]" />
+                    </div>
+                    <div id="tempAdd" class="tr" style="padding:5px;"><a href="javascript:addGoods()">+添加货品</a></div>
+                </if>
+            </td>
+        </tr>
+
+
+
+
+        <tr>
+            <td>备 注</td>
+            <td class="tf"><textarea name="comment" style="width:500px; height:150px;"><{$comment}></textarea></td>
+        </tr>
+    </table>
+    <input type="hidden" name="id" value="<{$id}>" />
+    <input type="submit" class="button" value="保 存" />
+</form>
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'});
+function addGoods(){
+    var clone = $("#tempAdd").prev("div").clone();
+    clone.children("input,select").val('');
+    clone.children(".unit").html('');
+    $("#tempAdd").before(clone);
+}
+function addMaterial(){
+    var clone = $("#tempAdd2").prev("div").clone();
+    clone.children("input,select").val('');
+    clone.children(".unit").html('');
+    $("#tempAdd2").before(clone);
+}
+function sumPrice(obj){
+    var num = parseInt($(obj).val(), 10); if(!num) return;
+    var price = $(obj).siblings(".goods").children("option:selected").attr("title");
+    var total = Math.round(num * price * 100)/100;
+    $(obj).siblings(".total").val(total);
+}
+$(document).ready(function(){
+    ajax("__APP__/Goods/index", {type:1}, 'post', function(data){
+        if(data.status){
+            for(x in data.data.type){
+                var t = data.data.type[x];
+                $(".goods_type").append("<option value='"+t.id+"'>"+t.levelstr+t.name+"</option>");
+            }
+            $(".goods").append("<option value=''>请选择...</option>");
+            var status = '<{$abs}>';
+            for(x in data.data.list){
+                var t = data.data.list[x];
+                var p = status ? t.cost : t.price;
+                $(".goods").append("<option class='"+t.type+"' key='"+t.unit+"' title='"+(p/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+            }
+            $(".goods").each(function(){
+                var opt = $(this).find("option[value='"+$(this).attr("id")+"']");
+                opt.attr("selected", true);
+                var type = opt.attr("class");
+                $(this).find("option[class!='"+type+"']").remove();
+                $(this).prev(".goods_type").find("option[value='"+type+"']").attr("selected", true);
+            })
+        }else{
+            alert("查询失败，请重试！");
+        }
+    });
+
+    $(".goods_type").live('change',function(){
+        var obj = $(this);
+        ajax("__APP__/Goods/index/type/"+$(this).val(), {type:$(this).val()}, 'post', function(data){
+            if(data.status){
+                var status = '<{$abs}>';
+                obj.nextAll(".goods").html("");
+                obj.nextAll(".goods").append("<option key='' value=''>请选择...</option>");
+                for(x in data.data.list){
+                    var t = data.data.list[x];
+                    var p = status ? t.cost : t.price;
+                    obj.nextAll(".goods").append("<option key='"+t.unit+"' title='"+(p/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+                }
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+    $(".goods").change(function(){
+        $(this).siblings(".unit").html($(this).children("option:selected").attr("key"));
+        $(this).siblings(".price").html("单价"+$(this).children("option:selected").attr("title"));
+        $(this).siblings(".goods_name").val($(this).children("option:selected").html());
+        sumPrice( $(this).siblings(".num").get() );
+    });
+
+	$("#cors").change(function(){
+		$("#showlist option").remove();
+		var type = $(this).val();
+		if("<{$types}>"==1)
+			types = "__APP__/Supplier/index";
+		else
+			types = "__APP__/Client/index";
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+				}else{
+					alert("查询失败！");
+				}
+	   		},
+			'json'
+	   );
+
+    });
+
+	var corsv = $("#showlist option:selected").attr("title");
+	$("#cors option[value='"+corsv+"']").attr("selected", true);
+	var corsa = '<{$cors}>';
+	$("#showlist option[value='"+corsa+"']").attr("selected", true);
+});
+</script>
+<include file="Public:footer" />

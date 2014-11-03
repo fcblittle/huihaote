@@ -1,0 +1,77 @@
+<include file="Public:header" />
+<h3><{$tname}>查看</h3>
+
+<form action="__URL__/auditParts" method="post">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">基本信息</th>
+        </tr>
+        <tr>
+            <td width="90">领用人</td>
+            <td class="tf"><{$operator}></td>
+        </tr>
+       <tr>
+            <td width="90">时间</td>
+            <td class="tf"><{$time|date="Y-m-d",###}></td>
+        </tr>
+
+        <tr>
+            <td>货 品</td>
+            <td class="tf">
+                <volist name="goods" id="vo">
+                    <div style="padding:5px;">
+                        <{$vo['name']}>(<{$vo['model']}>)<br />
+                        <div class="tr" style="color:#999; padding:5px 0px; border-bottom:#CCC dashed 1px;">
+                            领用：<{$vo['num']}><{$vo['unit']}>&nbsp; ┊ &nbsp;仓库：<{$groups[$vo['out_group']]['name']}><br />
+                            耗用：<{$vo['bad']}><{$vo['unit']}>&nbsp; ┊ &nbsp;仓库：<{$groups[$vo['in_group']]['name']}> <br />
+                            备注：<{$vo['com']|html}>
+                        </div>
+                    </div>
+                </volist>
+            </td>
+        </tr>
+
+        <tr>
+            <td>备 注</td>
+            <td class="tf"><{$comment|text}></td>
+        </tr>
+
+        <tr>
+            <th colspan="2">审核状态</th>
+        </tr>
+        <tr>
+            <td>状 态</td>
+            <td style="text-align:left;"><eq name="audit" value="0">未通过<else />已通过</eq></td>
+        </tr>
+
+    </table>
+
+    <div style="width:500px;">
+        <div class="f">
+            <input type="button" class="button" onclick="history.go(-1);" value="返 回" />
+        </div>
+
+        <eq name="audit" value="0">
+            <present name="can_do[$mname]['auditParts']">
+            <div class="r">
+                <input type="hidden" name="id" value="<{$id}>">
+                <input type="submit" name="type" class="button" value="审核通过" />
+                <input type="submit" name="type" class="button_red" value="审核拒绝" />
+            </div>
+            </present>
+        <else />
+            <div class="r">
+                <if condition="$audit gt 0">
+                    <present name="can_do[$mname]['printParts']">
+                        <input type="button" class="button" onclick="location.href='__URL__/printParts/id/<{$id}>'" value="打 印" />　
+                    </present>
+                </if>
+                <lt name="audit" value="0">
+                    <input type="button" class="button_red" onclick="location.href='__URL__/editParts/id/<{$id}>'" value="修 改" />
+                </lt>
+            </div>
+        </eq>
+    </div>
+</form>
+
+<include file="Public:footer" />

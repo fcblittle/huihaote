@@ -1,0 +1,91 @@
+<include file="Public:header" />
+<h3>支出统计</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+
+<div style="padding:0px 10px 10px 0px; margin-bottom:10px; border-bottom:#CCC dashed 1px;">
+    <a href="__URL__/statistics/">收支合计</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/trend">收支走势</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/goods">产品收支统计</a>
+</div>
+
+<form action="__URL__/statistics/type/goods" style="padding-bottom:10px;">
+货物类型：<select name="goods_type" class="goods_type"></select>
+货 品：<select name="goods" class="goods"></select>
+时 间：
+<input type="text" style="width:100px;" name="stime" readonly="readonly" onclick="showdatebox(this,'')" value="<{$stime}>" /> --
+<input type="text" style="width:100px;" name="etime" readonly="readonly" onclick="showdatebox(this,'')" value="<{$etime}>" />
+
+<input type="submit" value="查 询" />
+
+</form>
+
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>产品名</th>
+        <th>采购支出 / 量</th>
+        <th>实际购价</th>
+        <th>销售收入 / 量</th>
+        <th>实际售价</th>
+        <th>合 计</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><{$vo['name']}></td>
+        <td><{$vo['expense']|showPrice}> / <{$vo['e_num']}></td>
+        <td><{$vo['e_cost']|showPrice}></td>
+        <td><{$vo['revenue']|showPrice}> / <{$vo['r_num']}></td>
+        <td><{$vo['r_price']|showPrice}> </td>
+        <td>
+        <gt name="vo['sum']" value="0">
+            <span style="color:red"><{$vo['sum']|showPrice}></span>
+        <else />
+            <span style="color:green"><{$vo['sum']|showPrice}></span>
+        </gt>
+        </td>
+    </tr>
+    </volist>
+</table>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    ajax("__APP__/Goods/index", {type:1}, 'post', function(data){
+        if(data.status){
+            for(x in data.data.type){
+                var t = data.data.type[x];
+                $(".goods_type").append("<option value='"+t.id+"'>"+t.levelstr+t.name+"</option>");
+            }
+            $(".goods").append("<option value=''>请选择...</option>");
+            for(x in data.data.list){
+                var t = data.data.list[x];
+                $(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"'>"+t.name+"</option>");
+            }
+        }else{
+            alert("查询失败，请重试！");
+        }
+    });
+
+    $(".goods_type").change(function(){
+        var obj = $(this);
+        ajax("__APP__/Goods/index/type/"+$(this).val(), {type:$(this).val()}, 'post', function(data){
+            if(data.status){
+                obj.nextAll(".goods").html("");
+                obj.nextAll(".goods").append("<option key='' value=''>请选择...</option>");
+                for(x in data.data.list){
+                    var t = data.data.list[x];
+                    obj.nextAll(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"'>"+t.name+"</option>");
+                }
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+    $(".goods").change(function(){
+        $(this).siblings(".unit").html($(this).children("option:selected").attr("key"));
+        $(this).siblings(".cprice").val($(this).children("option:selected").attr("title"));
+        $(this).siblings(".goods_name").val($(this).children("option:selected").html());
+    });
+});
+</script>
+<include file="Public:footer" />

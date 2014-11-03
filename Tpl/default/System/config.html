@@ -1,0 +1,49 @@
+<include file="Public:header" />
+<h3><{$name}>资料设置</h3>
+
+<form action="__URL__/config" method="post">
+<table cellpadding="2" cellspacing="1" border="0" style="width:300px;" id="linebox">
+    <tr>
+        <th>类型</th>
+        <th>名称</th>
+        <th>值</th>
+    </tr>
+    <volist name="list" id="vo">
+        <tr>
+            <td>
+                <select name="name[]">
+                    <option value="sorder" <eq name="vo['name']" value="sorder">selected="selected"</eq>>销售</option>
+                    <option value="service1" <eq name="vo['name']" value="service1">selected="selected"</eq>>维修人</option>
+                    <option value="service2" <eq name="vo['name']" value="service2">selected="selected"</eq>>维修类型</option>
+                </select>
+                <input type="hidden" name="id[]" value="<{$vo['id']}>" />
+            </td>
+            <td><input name="intro[]" type="text" value="<{$vo['intro']}>" /></td>
+            <td><input name="value[]" type="text" style="width:100px;" value="<{$vo['value']}>" />　%</td>
+        </tr>
+    </volist>
+    <tr>
+        <td>
+            <select name="name[]">
+                <option value="sorder">销售</option>
+                <option value="service1">维修人</option>
+                <option value="service2">维修类型</option>
+            </select>
+        </td>
+        <td><input name="intro[]" type="text" value="" /></td>
+        <td><input name="value[]" type="text" value="" /></td>
+    </tr>
+</table>
+<input type="button" class="button" onclick="addline()" value="增 加" />
+<input type="submit" class="button" value="保 存" />
+</form>
+<script type="text/javascript">
+function addline(){
+    $("#linebox").append($("#linebox tr:last").clone());
+
+    $("#linebox tr:last").find('input').each(function(x){
+        $(this).val('');
+    });
+}
+</script>
+<include file="Public:footer" />

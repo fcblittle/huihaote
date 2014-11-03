@@ -1,0 +1,30 @@
+<include file="Public:header" />
+<h3>货品生产公式</h3>
+
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th width="200">产 出</th>
+        <th>所需原材料</th>
+        <th width="170">操 作</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><{$vo['num']}><{$vo['goods']['unit']}><{$vo['goods']['name']}></td>
+        <td>
+            <sublist name="vo['need']" id="so">
+                <{$so['num']}><{$so['goods']['unit']}><{$so['goods']['name']}>，
+            </sublist>
+        </td>
+        <td>
+            &nbsp;┊&nbsp;<a href="__URL__/formula/type/del/id/<{$vo.id}>">删 除</a>&nbsp;┊&nbsp;
+        </td>
+    </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="6" class="tr"><{$page}></td>
+    </tr>
+</table>
+
+<input class="button" onclick="location.href='__URL__/formula/type/add'" type="button" value="添 加" />
+
+<include file="Public:footer" />

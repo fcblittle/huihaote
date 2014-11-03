@@ -1,0 +1,311 @@
+<include file="Public:header" />
+<h3><{$tname}>添加</h3>
+
+<form action="__URL__/add" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">填写信息</th>
+        </tr>
+        <tr>
+            <td width="90">单 号</td>
+            <td class="tf"><input type="text" style="width:250px;" name="num" value="<{$num}>" /></td>
+        </tr>
+        <tr>
+            <td>税 率</td>
+            <td class="tf"><input type="text" style="width:100px;" name="tax" id="tax" value="<{$tax}>" onkeyup="changeTax()" />%</td>
+        </tr>
+        <tr>
+            <td>时 间</td>
+            <td class="tf"><input type="text" style="width:250px;" name="time" value="<{$time|date='Y-m-d H:i',###}>" /></td>
+        </tr>
+        <?php if($mname=='Sorder' || $mname=='Porder'){ ?>
+            <tr>
+                <td>人员</td>
+                <td class="tf">
+                    <select name="sale">
+                        <iterate name="allUsers" id="vo">
+                            <option value="<{$vo['uid']}>" <eq name="nowUid" value="$vo['uid']">selected="selected"</eq>><{$vo['name']}></option>
+                        </iterate>
+                    </select>
+                    <!--<input type="text" style="width:120px;" name="sale" value="<{$sale}>" />-->
+                </td>
+            </tr>
+            <tr>
+                <td>发票提醒</td>
+                <td class="tf">
+                    <input type="text" style="width:120px;" name="bill" value="<if condition='$bill'><{$bill|date='Y-m-d H:i', ###}></if>" />
+                    <span style="font-size:12px;">格式：2012-09-09 14:25，不需要为空</span>
+                </td>
+            </tr>
+            <tr>
+                <td>余款提醒</td>
+                <td class="tf">
+                    <input type="text" style="width:120px;" name="spare" value="<if condition='$spare'><{$spare|date='Y-m-d H:i', ###}></if>" />
+                    <span style="font-size:12px;">格式：2012-09-09 14:25，不需要为空</span>
+                </td>
+            </tr>
+            <!--
+            <tr>
+                <td>已付/收款</td>
+                <td class="tf">
+                    <input type="text" style="width:80px;" name="havemoney" value="" />
+                </td>
+            </tr>
+
+            <tr>
+                <td>方 式</td>
+                <td class="tf">
+                    <select id="way" name="way" onchange="showBank()">
+                        <option value="0">现金</option>
+                        <option value="1">银行</option>
+                    </select>
+                </td>
+            </tr>
+            <tr id="bank" style="display:none;">
+                <td>银 行</td>
+                <td class="tf">
+                    <select name="bank">
+                        <iterate name="banks" id="vo">
+                            <option value="<{$vo['id']}>"><{$vo['name']}></option>
+                        </iterate>
+                    </select>
+                </td>
+            </tr>
+            -->
+        <?php }?>
+
+        <neq name="mname" value="Wastage">
+            <tr>
+                <td><eq name="abs" value="1">供应商<else />客 户</eq></td>
+                <td class="tf">
+                    <select  id="cors">
+                        <volist name="DB_type" id="vo">
+                        <option value="<{$vo['id']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+                        </volist>
+                    </select>
+                    <select id="showlist" name="cors">
+                        <option value="">请选择...</option>
+                        <volist name ="cors" id ="to">
+                        	<option value="<{$to['id']}>"><{$to['name']}></option>
+                        </volist>
+                    </select>
+                    <eq name="abs" value="1">
+                        <present name="can_do['Supplier']['add']"><a href="__APP__/Supplier/add/return/<{$mname}>">+添加供应商</a></present>
+                    <else />
+                        <present name="can_do['Client']['add']"><a href="__APP__/Client/add/return/<{$mname}>">+添加客户</a></present>
+                    </eq>
+                </td>
+            </tr>
+            <tr>
+                <td>货 品</td>
+                <td class="tf">
+                    <div class="tr" style="padding:5px;"><a href="__APP__/Goods/add/return/<{$mname}>">+添加新商品</a></div>
+                    <div style="padding:10px 5px; border-bottom:#666 dashed 1px;" class="products">
+                        货品类型：<select class="goods_type" style="width:150px;"></select>
+                        货品：<select name="goods[]" class="goods" style="width:300px;"></select>
+                        <!--<span class="price"></span> -->
+                        <br /><br />
+                        　　 单 价：<input autocomplete='off' class="price" type="text" style="width:80px;" onkeyup="<eq name='needprice' value='1'>sumPrice(this)</eq>" name="goods_price[]" /> 元　 　
+                        　　 数 量：<input autocomplete='off' type="text" class="num" style="width:80px;" name="goods_num[]" onkeyup="<eq name='needprice' value='1'>sumPrice(this)</eq>" /> <span class="unit"></span>
+                        <br /><br />
+                        　　 税 额：<input autocomplete='off' type="text" class="tax_total" style="width:80px;" name="tax_total[]" readonly="readonly" /> 元
+                            <eq name="needprice" value="1">　　总金额：<input type="text" autocomplete='off' class="all_total" readonly="readonly" style="width:80px;" name="total[]" /> 元</eq>
+                        <br /><br />
+                        　　备注：<input autocomplete='off' type="text" style="width:300px;" name="goods_com[]" />
+                    </div>
+                    <div id="tempAdd" class="tr" style="padding:5px;"><a href="javascript:addGoods()">+添加货品</a></div>
+                </td>
+            </tr>
+            <tr>
+                <td>总 价</td>
+                <td class="tf" id="allTotal">0　元</td>
+            </tr>
+        </neq>
+
+
+        <eq name="mname" value="Wastage">
+        <tr >
+        	<td>原材料</td>
+            <td class="tf">
+            	<div style="padding:10px 5px; border-bottom:#666 dashed 1px;">
+                    来 源：
+                    <select name="material[group][]" style="width:100px;">
+                        <volist name="group" id="vo">
+                        <option value="<{$vo['gid']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+                        </volist>
+                    </select>
+                    原 料：
+                    <select class="goods" name="material[goods][]" style="width:200px;"></select>
+                    <br /><br />
+                    使用量：
+                    <input type="text" style="width:50px;" name="material[used][]" />
+                    <span class="unit"></span>　
+                    作废量：
+                    <input type="text" style="width:50px;" name="material[surplus][]" />
+                    <span class="unit"></span>
+                </div>
+                <div id="tempAdd2" class="tr" style="padding:5px;"><a href="javascript:addMaterial()">+添加原材料</a></div>
+            </td>
+        </tr>
+        </eq>
+
+        <tr>
+            <td>备 注</td>
+            <td class="tf"><textarea name="comment" style="width:500px; height:150px;"></textarea></td>
+        </tr>
+    </table>
+    <input type="submit" class="button" value="保 存" />
+</form>
+
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'})
+function addGoods(){
+    var clone = $("#tempAdd").prev("div").html();
+    
+    //clone.children(".unit").html('');
+    $("#tempAdd").before('<div style="padding:10px 5px; border-bottom:#666 dashed 1px;">'+clone+"</div>");
+    var obj = $("#tempAdd").prev("div");
+    obj.find("input").each(function(){
+        $(this).val('');
+    });
+    obj.find("select").each(function(){
+        $(this).val('');
+    });
+}
+function addMaterial(){
+    var clone = $("#tempAdd2").prev("div").clone();
+    clone.children("input,select").val('');
+    clone.children(".unit").html('');
+    $("#tempAdd2").before(clone);
+}
+
+//计算总价
+function sumPrice(obj){
+    //数量
+    var num = parseInt($(obj).parents().find(".num").val(), 10);
+    if(!num)
+        num = 0;
+    //含税价格
+    var price = $(obj).parents().find(".price").val();
+    if(!price){
+        return '';
+    }
+
+    //总价
+    var total = Math.round(num * price * 100000000)/100000000;
+    $(obj).parent().find(".all_total").val(total);
+
+    //税率
+    var tax = parseFloat($("#tax").val(), 10);
+    if(tax>0)
+    {
+        var noTaxPrice = total/(1+tax/100);
+        var tax_total = parseInt(Math.round(noTaxPrice*tax), 10)/100;
+        $(obj).parent().find(".tax_total").val(tax_total);
+    }
+
+
+    //订单总价
+    var allTotal = 0;
+    $(".all_total").each(function(i){
+        var _total = parseInt($(this).val());
+        allTotal += _total;
+    }   );
+    $("#allTotal").html(allTotal+'　元');
+}
+
+function changeTax()
+{
+    $(".products").each(function(i){
+        sumPrice(this);
+    });
+}
+
+$(document).ready(function(){
+    ajax("__APP__/Goods/index", {type:1}, 'post', function(data){
+        if(data.status){
+            for(x in data.data.type){
+                var t = data.data.type[x];
+                $(".goods_type").append("<option value='"+t.id+"'>"+t.levelstr+t.name+"</option>");
+            }
+            $(".goods").append("<option value=''>请选择...</option>");
+            var status = '<{$abs}>';
+            for(x in data.data.list){
+                var t = data.data.list[x];
+                var p = status ? t.cost : t.price;
+				p = p/100;
+                $(".goods").append("<option key='"+t.unit+"' title='"+ p +"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+            }
+        }else{
+            alert("查询失败，请重试！");
+        }
+    });
+
+    $(".goods_type").live('change', function(){
+        var obj = $(this);
+        ajax("__APP__/Goods/index/type/"+$(this).val(), {type:$(this).val()}, 'post', function(data){
+            if(data.status){
+                var status = '<{$abs}>';
+                obj.nextAll(".goods").html("");
+                obj.nextAll(".goods").append("<option key='' value=''>请选择...</option>");
+                for(x in data.data.list){
+                    var t = data.data.list[x];
+                    var p = status ? t.cost : t.price;
+					p = p/100;
+                    obj.nextAll(".goods").append("<option key='"+t.unit+"' title='"+p+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+                }
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+    $(".goods").change(function(){
+        $(this).siblings(".unit").html($(this).children("option:selected").attr("key"));
+        //$(this).siblings(".price").val($(this).children("option:selected").attr("title"));
+        $(this).siblings(".goods_name").val($(this).children("option:selected").html());
+        sumPrice( $(this).siblings(".num").get() );
+    });
+
+	$("#cors").change(function(){
+		 $("#showlist option").remove();
+		var type = $(this).val();
+		if("<{$types}>" ==1)
+			var types = "__APP__/Supplier/index";
+			else
+				var types = "__APP__/Client/index";
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+				}else{
+					alert("121");
+				}
+	   		},
+			'json'
+	   );
+
+    });
+
+});
+
+function showBank()
+{
+    var way = $("#way").val();
+    if(way > 0){
+        $("#bank").show();
+    }else{
+        $("#bank").hide();
+    }
+}
+
+showBank();
+</script>
+<include file="Public:footer" />

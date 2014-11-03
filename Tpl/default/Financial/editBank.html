@@ -1,0 +1,55 @@
+<include file="Public:header" />
+<h3>银行账号修改</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/editBank" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+        <tr>
+            <th colspan="2">基本数据</th>
+        </tr>
+        <tr>
+            <td>银行类型</td>
+            <td class="tf">
+                <select name="name">
+                    <option>--请选择--</option>
+                    <option value="中国银行" <eq name="name" value="中国银行">selected="selected"</eq>>中国银行</option>
+                    <option value="中国建设银行" <eq name="name" value="中国建设银行">selected="selected"</eq>>中国建设银行</option>
+                    <option value="中国农业银行" <eq name="name" value="中国农业银行">selected="selected"</eq>>中国农业银行</option>
+                    <option value="中国工商银行" <eq name="name" value="中国工商银行">selected="selected"</eq>>中国工商银行</option>
+                    <option value="外贸部银行" <eq name="name" value="外贸部银行">selected="selected"</eq>>外贸部银行</option>
+                    <option value="中国招商银行" <eq name="name" value="中国招商银行">selected="selected"</eq>>中国招商银行</option>
+                    <option value="交通银行" <eq name="name" value="交通银行">selected="selected"</eq>>交通银行</option>
+                    <option value="中国光大银行" <eq name="name" value="中国光大银行">selected="selected"</eq>>中国光大银行</option>
+                    <option value="兴业银行" <eq name="name" value="兴业银行">selected="selected"</eq>>兴业银行</option>
+                    <option value="调账银行" <eq name="name" value="调账银行">selected="selected"</eq>>调账银行</option>
+                    <option value="中国民生银行" <eq name="name" value="中国民生银行">selected="selected"</eq>>中国民生银行</option>
+                    <option value="青岛银行" <eq name="name" value="青岛银行">selected="selected"</eq>>青岛银行</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>银行账号</td>
+            <td class="tf"><input type="text" style="width:250px;" name="account" value="<{$account}>" /></td>
+        </tr>
+        <tr>
+            <td>开户人</td>
+            <td class="tf"><input type="text" style="width:150px;" name="holder"  value="<{$holder}>" /></td>
+        </tr>
+        <tr>
+            <td>开户时间</td>
+            <td class="tf"><input type="text" style="width:150px;" name="time" readonly="readonly" value="<{$time|date='Y-m-d', ###}>" onclick="showdatebox(this,'')" /></td>
+        </tr>
+        <tr>
+            <td>开户银行</td>
+            <td class="tf"><input type="text" style="width:250px;" name="address" value="<{$address}>" /></td>
+        </tr>
+    </table>
+    <input type="hidden" name="id" value="<{$id}>" />
+    <input type="submit" class="button" value="保 存" />
+    <input type="button" class="button" onclick="history.go(-1);" value="返 回" />
+</form>
+
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'})
+</script>
+<include file="Public:footer" />

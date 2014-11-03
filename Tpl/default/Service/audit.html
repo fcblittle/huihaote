@@ -1,0 +1,42 @@
+<include file="Public:header" />
+<h3><{$tname}>未审核列表</h3>
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>单 号</th>
+        <th><eq name="abs" value="1">供应商<else />客 户</eq></th>
+        <th width="80">维修人</th>
+        <th width="120">申请时间</th>
+        <th width="100">状态</th>
+        <th width="200">操 作</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><{$vo.num}></td>
+        <td><{$vo['cors']['name']}></td>
+        <td><{$vo['sorts']['intro']}></td>
+        <td><{$vo.time|date='Y-m-d H:i',###}></td>
+        <td>
+            <eq name="vo['audit']" value="0">
+                未审核
+            <else />
+                <gt name="vo['audit']" value="0">
+                    通过
+                <else />
+                    拒绝
+                </gt>
+            </eq>
+        </td>
+        <td>
+            <present name="can_do[$mname]['view']">&nbsp;┊&nbsp;<a href="__URL__/audit/view/<{$vo.id}>/url/audit">查 看</a></present>
+            <present name="can_do[$mname]['edit']">&nbsp;┊&nbsp;<a href="__URL__/audit/edit/<{$vo.id}>/url/audit">修 改</a></present>
+            <present name="can_do[$mname]['delete']">&nbsp;┊&nbsp;<a href="__URL__/audit/delete/<{$vo.id}>/url/audit">删 除</a></present>
+            &nbsp;┊&nbsp;
+        </td>
+    </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="6" class="tr"><{$page}></td>
+    </tr>
+</table>
+
+<include file="Public:footer" />

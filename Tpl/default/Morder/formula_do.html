@@ -1,0 +1,97 @@
+<include file="Public:header" />
+<h3>货品生产材料计算</h3>
+
+<form action="__URL__/add/out/<{$out}>" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+
+        <volist name="list" id="vo" key="k">
+        <tr>
+            <th class="tf">
+                <div><{$k}>. <{$goods[$vo['goods']]['name']}> <{$vo['num']}><{$goods[$vo['goods']]['unit']}></div>
+            </th>
+        </tr>
+        <tr>
+            <td class="tf">
+                <present name="vo['formula']">
+                <sublist name="vo['formula']['need']" id="so">
+                    <div style="padding:10px 5px;">
+                        <input class="goods" type="hidden" value="<{$so['goods']}>" />
+                        <input name="goods[<{$so['goods']}>]" type="hidden" value="<{$goods[$so['goods']]['name']}>" />
+                        <input name="total[$so['goods']]" style="width:60px;" value="<{$so['num']}>" />
+                        <{$goods[$so['goods']]['unit']}> <{$goods[$so['goods']]['name']}>
+                    </div>
+                    <div class="vBox" style="padding:10px 5px; background:#EEE;">
+                        仓 库：
+                        <select name="group[<{$so['goods']}>][]">
+                            <volist name="group" id="go">
+                            <option value="<{$go['gid']}>"><{$go['levelstr']}><{$go['name']}></option>
+                            </volist>
+                        </select>&nbsp;
+                        数 量：<input type="text" style="width:50px;" class="vBox" name="num[<{$so['goods']}>][]" />
+                    </div>
+                    <div id="tempAdd" class="tr" style="padding:5px;"><a href="javascript:addGroup()">+添加仓库分配</a></div>
+                </sublist>
+                <else />
+                    该产品没有公式！
+                </present>
+            </td>
+        </tr>
+        </volist>
+
+
+    </table>
+    <input type="submit" class="button" value="保 存" />
+    <input type="button" class="button" onclick="location.href='__URL__/index'" value="返 回" />
+</form>
+
+
+<script type="text/javascript">
+function addLine(){
+    var clone = $("#trtemp").prev("tr").clone();
+    clone.find("select,input").val("");
+    clone.find(".unit").html("");
+    $("#trtemp").before(clone);
+}
+$("select").change(function(){
+    var u = $(this).find("option:selected").attr("key");
+    $(this).closest("tr").find(".unit").html(u);
+});
+
+
+function addGroup(){
+    var clone = $("#tempAdd").prev("div").clone();
+    clone.children("input,select").val('');
+    $("#tempAdd").before(clone);
+}
+
+//出库数不超过库存
+$(".vBox input:text").change(function(){
+    var obj = $(this);
+    var group = $(this).prevAll("select:eq(0)").val();
+    var goods = parseInt(obj.parent().parent().find(".goods").val());
+    ajax("__APP__/Stock/getsum/", {group:group,goods:goods}, 'get', function(data){
+        if(data.status == 1){
+            if(parseFloat(data.data) < parseFloat(obj.val()) ){
+                alert("设定数量超过库存数目！");
+                obj.val(parseFloat(data.data));
+                return;
+            }
+        }else{
+            alert("读取仓库库存数据错误！");
+        }
+    });
+    var sum = parseFloat(obj.parent().parent().children(".num").val());
+    var count = 0;
+    $(".vBox input:text").each(function(i){
+        count += parseFloat($(this).val());
+    });
+    if(count > sum) {
+        alert("设定数量超过订单总数！");
+        obj.val(sum - (count - parseFloat($(this).val())));
+        return;
+    }
+});
+
+</script>
+
+<include file="Public:footer" />

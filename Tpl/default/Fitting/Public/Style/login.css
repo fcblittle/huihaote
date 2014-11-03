@@ -1,0 +1,20 @@
+@charset "utf-8";
+/* CSS Document */
+#login{ margin:100px auto; width:720px; height:400px; background:url("../Images/loginbg.jpg") no-repeat;}
+#login form{ display:block; padding-top:180px; padding-left:390px; text-align:left;}
+#login form div{}
+#login form input{ background:transparent url("../Images/login_button.gif") no-repeat; border:none; outline:none;}
+#login form .text{ display:block; width:190px; height:25px; background:url("../Images/login_text.gif") left -25px; overflow:hidden; margin-bottom:25px; overflow:hidden; padding:0px 10px;}
+#login form .text input{ background:transparent none; width:190px; height:25px;  font-size:14px; font-weight:bold; font-family:微软雅黑, 宋体, Tahoma, Geneva, sans-serif; color:#c4c4e0; line-height:25px; float:left; margin:0px;}
+#login form .hover{ background:url("../Images/login_text.gif") left top;}
+#login form .hover input{ color:#FFFFFF;}
+#login form .submit, #login form .close{ margin-left:10px; width:90px; height:38px; cursor:pointer;}
+#login form .close{ background-position:top right; margin-left:0px;}
+#login form .submit_h{background-position:bottom left;}
+#login form .close_h{background-position:bottom right;}
+
+/* success */
+#message{ margin:100px auto; width:500px; padding-top:50px; background:url("../Images/success_bg.gif") no-repeat top left;}
+#message .con{ background:url("../Images/success_bg.gif") no-repeat bottom left; padding-bottom:50px;}
+#message .con .msg{font-size:16px; font-weight:bold; padding:15px 0px;}
+#message .con .link{ margin:0 auto; width:400px; padding-top:10px; border-top:dotted 1px #999;}

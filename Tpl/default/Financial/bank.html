@@ -1,0 +1,44 @@
+<include file="Public:header" />
+<h3><{$tname}>列表</h3>
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>银行</th>
+        <th>银行账号</th>
+        <th>开户人</th>
+        <th>开户时间</th>
+        <th>开户银行</th>
+        <th width="250">操作</th>
+    </tr>
+    <volist name="list" id="vo">
+        <tr>
+            <td><a href="__URL__/viewBank/id/<{$vo.id}>"><{$vo.name}></a></td>
+            <td><{$vo.account}></td>
+            <td><{$vo.holder}></td>
+            <td><{$vo.time|date='Y-m-d',###}></td>
+            <td><{$vo.address}></td>
+            <td>
+                <present name="can_do['Financial']['editBank']"><a href="__URL__/editBank/id/<{$vo.id}>">修 改</a></present>
+                <present name="can_do['Financial']['deleteBank']">&nbsp;┊&nbsp;<a href="__URL__/deleteBank/id/<{$vo.id}>">删 除</a></present>
+            </td>
+        </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="6" class="tr"><{$page}></td>
+        <script src="../Public/JS/datebox.js"></script>
+    </tr>
+</table>
+
+<present name="can_do['Financial']['addBank']"><input type="button" class="button" onclick="location.href='__URL__/addBank'" value="添 加" /> &nbsp;</present>
+
+<script type="text/javascript">
+function openSearch(){
+    $("#Search").show();
+}
+function audit(id){
+    if(window.confirm("该款项已经结清，是否确认？\n如有欠款，可编辑修改")){
+        location.href='__URL__/audit/id/'+id;
+    }
+}
+$("#selectName").change(function(){if($(this).val() == 'other'){$("#nameOther").show();}else{$("#nameOther").hide();} });
+</script>
+<include file="Public:footer" />

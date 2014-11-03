@@ -1,0 +1,81 @@
+<include file="Public:header" />
+<h3>财务收支添加</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/add" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+        <tr>
+            <th colspan="2">基本数据</th>
+        </tr>
+        <tr>
+            <td>编号<em>*</em></td>
+            <td class="tf"><input type="text" style="width:250px;" name="num" value="<{$num}>" /></td>
+        </tr>
+        <tr>
+            <td>收支项目<em>*</em></td>
+            <td class="tf"><input type="text" style="width:250px;" name="name" /></td>
+        </tr>
+        <tr>
+            <td>金　额<em>*</em></td>
+            <td class="tf"><input type="text" style="width:250px;" name="price" /></td>
+        </tr>
+        <tr>
+            <td>方 式</td>
+            <td class="tf">
+                <select id="way" name="way" onchange="showBank()">
+                    <option value="0">现金</option>
+                    <option value="1">银行</option>
+                </select>
+            </td>
+        </tr>
+        <tr id="bank" style="display:none;">
+            <td>银 行</td>
+            <td class="tf">
+                <select name="bank">
+                    <iterate name="banks" id="vo">
+                        <option value="<{$vo['id']}>"><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>做账日期<em>*</em></td>
+            <td class="tf"><input type="text" style="width:250px;" name="time" readonly="readonly" onclick="showdatebox(this,'')" /></td>
+        </tr>
+        <tr>
+            <td>发票<em>*</em></td>
+            <td class="tf">
+                <select name="bill">
+                    <option value="未开">未开</option>
+                    <option value="已开">已开</option>
+                    <option value="不含税">不含税</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>发票编号</td>
+            <td class="tf"><input type="text" name="billnum" value="" /></td>
+        </tr>
+        <tr>
+            <td>未到金额</td>
+            <td class="tf"><input type="text" style="width:250px;" name="notto" value="￥0.00" /><br /></td>
+        </tr>
+    </table>
+    <input type="submit" class="button" value="保 存" />
+    <input type="button" class="button" onclick="location.href='__URL__/index'" value="返 回" />
+</form>
+
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'})
+
+function showBank()
+{
+    var way = $("#way").val();
+    if(way > 0){
+        $("#bank").show();
+    }else{
+        $("#bank").hide();
+    }
+}
+</script>
+<include file="Public:footer" />

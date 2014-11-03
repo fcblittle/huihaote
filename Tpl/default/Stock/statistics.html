@@ -1,0 +1,164 @@
+<include file="Public:header" />
+<h3>库存统计</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<div style="padding:0px 10px 10px 0px; margin-bottom:10px; border-bottom:#CCC dashed 1px; ">
+    <a href="__URL__/statistics/">仓库存量</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/inout">货品进出量</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/trend">货品进出量走势</a>
+</div>
+
+<form action="__URL__/statistics/" >
+仓 库：
+<select name="group" style="margin-bottom:10px;">
+    <volist name="group" id="vo">
+    <option value="<{$vo['gid']}>" <eq name="vo['gid']" value="$gid">selected="selected"</eq> ><{$vo['levelstr']}><{$vo['name']}></option>
+    </volist>
+</select>
+货物类型：<select name="goods_type" class="goods_type"></select>
+货 品：<select name="goods" class="goods"></select>
+日 期：<input type="text" style="width:100px;" name="stime" onclick="showdatebox(this,'')" /> --
+<input type="text" style="width:100px;" name="etime" onclick="showdatebox(this,'')" />
+<input type="submit" name="ac" value="查 询" />
+<input type="submit" name="ac" value="导 出" />
+</form>
+
+
+<style type="text/css">
+.cl{ display:block; #padding-left:30%; #text-align:left; text-align:center;}
+</style>
+
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>产品名称</th>
+        <th width="100">总 量</th>
+        <eq name="colspan" value="6">
+            <th>初始量</th>
+            <th>进量</th>
+            <!--
+            <th>采购价格</th>
+            -->
+            <th>采购总价<?php $payTotal = 0; ?></th>
+            <th>出量</th>
+            <!--
+            <th >销售价格</th>
+            -->
+            <th>销售总价<?php $incomeTotal = 0; ?></th>                                                             
+        <else />
+            <!--<th width="100">采购价格</th>-->
+            <th width="200">采购总价<?php $payTotal = 0; ?></th>
+            <!--<th width="100">销售价格<?php $incomeTotal = 0; ?></th>-->
+            <th width="200">销售总价</th>
+        </eq>
+
+        <th width="150">操 作</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td>
+            <span class="cl">
+            <present name="can_do['Goods']['view']">
+                <a href="__APP__/Goods/view/id/<{$vo.goods}>"><{$allgoods[$vo['goods']]['name']}></a>
+            <else />
+                <{$allgoods[$vo['goods']]['name']}>
+            </present>
+            (<{$allgoods[$vo['goods']]['model']}>)
+            </span>
+        </td>
+        <td><{$vo.sum}> <{$allgoods[$vo['goods']]['unit']}></td>
+        <eq name="colspan" value="6">
+            <td><{$vo.start}> <{$allgoods[$vo['goods']]['unit']}></td>
+
+            <td><{$vo.in}> <{$allgoods[$vo['goods']]['unit']}></td>
+            <!--
+            <td><?php echo showPrice($allgoods[$vo['goods']]['cost']); ?></td>
+            -->
+            <td><?php echo showPrice($vo['inprice']); /*$costTotal += $vo['in'] * $allgoods[$vo['goods']]['cost']; */ $costTotal += $vo['inprice'];?></td>
+            <td><{$vo.out}> <{$allgoods[$vo['goods']]['unit']}></td>
+            <!--
+            <td><?php echo showPrice($allgoods[$vo['goods']]['price']); ?></td>
+            -->
+            <td><?php echo showPrice($vo['outprice']); /*$priceTotal += $vo['out'] * $allgoods[$vo['goods']]['price'];*/ $priceTotal += $vo['outprice']; ?></td>
+        <else />
+            <!--<td><?php echo showPrice($allgoods[$vo['goods']]['cost']); ?></td>-->
+            <td><?php echo showPrice($vo['pay']); $payTotal += $vo['pay']; ?></td>
+            <!--<td><?php echo showPrice($allgoods[$vo['goods']]['price']); ?></td>-->
+            <td><?php echo showPrice($vo['income']); $incomeTotal += $vo['income']; ?></td>
+        </eq>
+        <td>
+        <!--
+            <present name="can_do['Stock']['inorde']">
+            &nbsp;┊&nbsp; <a href="__URL__/inorde/group/<{$gid}>/goods/<{$vo['goods']}>/type/de">报 损</a>
+            &nbsp;┊&nbsp; <a href="__URL__/inorde/group/<{$gid}>/goods/<{$vo['goods']}>/type/in">报 溢</a>
+            &nbsp;┊&nbsp;
+            </present>
+        -->
+            <a href="__URL__/detail/group/<{$gid}>/goods/<{$vo['goods']}>">详 情</a>
+        </td>
+    </tr>
+    </volist>
+    <neq name="colspan" value="6">
+    <tr>
+        <th colspan="2">合 计</th>
+        <th><{$payTotal|showPrice}></th>
+        <th><{$incomeTotal|showPrice}></th>
+        <th>&nbsp;</th>
+    </tr>
+    <else />
+    <tr>
+        <th colspan="4">合 计</th>
+        <th><{$costTotal|showPrice}></th>
+        <th colspan="1">&nbsp;</th>
+        <th><{$priceTotal|showPrice}></th>
+        <th colspan="2">&nbsp;</th>
+    </tr>
+    </neq>
+</table>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    ajax("__APP__/Goods/index", {type:1}, 'post', function(data){
+        if(data.status){
+            var select = '';
+            for(x in data.data.type){
+                var t = data.data.type[x];
+                select = (t.id == '<?php echo (int)$_GET['goods_type']; ?>') ? 'selected="selected"' : '';
+                $(".goods_type").append("<option value='"+t.id+"' "+select+">"+t.levelstr+t.name+"</option>");
+            }
+            $(".goods").append("<option value=''>请选择...</option>");
+            var type = '<?php echo (int)$_GET['goods_type']; ?>';
+            for(x in data.data.list){
+                var t = data.data.list[x];
+                select = (t.id == '<?php echo (int)$_GET['goods']; ?>') ? 'selected="selected"' : '';
+                if(type && t.type == type)
+                $(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"' "+select+">"+t.name+'('+t.model+')'+"</option>");
+            }
+        }else{
+            alert("查询失败，请重试！");
+        }
+    });
+
+    $(".goods_type").change(function(){
+        var obj = $(this);
+        ajax("__APP__/Goods/index/type/"+$(this).val(), {type:$(this).val()}, 'post', function(data){
+            if(data.status){
+                obj.nextAll(".goods").html("");
+                obj.nextAll(".goods").append("<option key='' value=''>请选择...</option>");
+                for(x in data.data.list){
+                    var t = data.data.list[x];
+                    obj.next(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+                }
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+    $(".goods").change(function(){
+        $(this).siblings(".unit").html($(this).children("option:selected").attr("key"));
+        $(this).siblings(".cprice").val($(this).children("option:selected").attr("title"));
+        $(this).siblings(".goods_name").val($(this).children("option:selected").html());
+    });
+});
+</script>
+<include file="Public:footer" />

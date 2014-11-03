@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>打印</title>
+<style>
+	.limit{width:640px; margin-top:20px; color:#000; font-size:12px;}
+	.clear{ clear:both; height:0px; overflow:hidden; }
+	.table {border-left:1px solid #333; border-top:1px solid #333;}
+	.table td{border-right:1px solid #333; border-bottom:1px solid #333; line-height:20px; height:20px; font-size:12px; text-align:center;}
+	#ixcore_run_time{ display:none;}
+	#ixcore_page_trace{ display:none;}
+</style>
+</head>
+
+<body class="limit">
+    <div style="margin-top:10px; font-size:12px;">
+        <img src="./logo.gif" width="50" style="vertical-align:middle;" />
+        <span>青岛惠好特自动化设备有限公司<span>
+    </div>
+
+    <h1 style="text-align:center; font-size:20px; margin:5px 0px;">配件领用</h1>
+    <table width="100%" cellpadding="0" cellspacing="0" class="table">
+    	<tr height="30">
+        	<td>时间</td>
+            <td>领用人</td>
+            <td>配件名称</td>
+            <td>型号</td>
+            <td>数量</td>
+            <td>出货仓库</td>
+            <td>入库仓库</td>
+            <td>备注</td>
+        </tr>
+        <iterate name="goods" id="vo">
+            <tr>
+                <td><{$time|date="Y-m-d", ###}></td>
+                <td><{$operator}></td>
+                <td><{$vo['name']}></td>
+                <td><{$vo['model']}></td>
+                <td><{$vo['num']}></td>
+                <td><{$groups[$vo['out_group']]['name']}></td>
+                <td><{$groups[$vo['in_group']]['name']}></td>
+                <td><{$vo['com']}></td>
+            </tr>
+        </iterate>
+    </table>
+</div>
+</body>
+</html>

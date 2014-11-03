@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>打印</title>
+<style>
+	.limit{width:680px; margin-top:20px; color:#000; font-size:12px;}
+	.clear{ clear:both; height:0px; overflow:hidden; }
+	.table {border-left:1px solid #333; border-top:1px solid #333; width:100%;}
+	.table td{border-right:1px solid #333; border-bottom:1px solid #333; line-height:20px; height:20px; font-size:12px; text-align:center;}
+	#ixcore_run_time{ display:none;}
+	#ixcore_page_trace{ display:none;}
+</style>
+</head>
+
+<body class="limit">
+    <div style="margin-top:10px; font-size:12px;">
+        <img src="./logo.gif" widtd="50" style="vertical-align:middle;" />
+        <span>青岛惠好特自动化设备有限公司<span>
+    </div>
+
+    <h1 style="text-align:center; font-size:20px; margin:5px 0px;">财务统计列表</h1>
+
+    <div style="height:30px; line-height:30px; widtd:100%; margin:5px;">
+        <div style="widtd:100%; float:left;">时间： <if condition="$stime"><{$stime}> 至 <{$etime}></if></div>
+    </div>
+
+    <table cellpadding="0" cellspacing="0" border="0" class="table">
+        <tr>
+            <td>收支内容</td>
+            <td>收支金额</td>
+            <td>提成</td>
+            <td widtd="100">做账日期</td>
+            <td>到账情况</td>
+            <td widtd="100">做账人</td>
+        </tr>
+        <volist name="list" id="vo">
+            <tr>
+                <td><{$vo.name|text}></td>
+                <td>
+                    <gt name="vo.price" value="0">
+                        <span style="color:green"><?php echo showPrice(abs($vo['price'])-abs($vo['notto'])); ?></span>
+                    <else />
+                        <span style="color:red">-<?php echo showPrice(abs($vo['price'])-abs($vo['notto'])); ?></span>
+                    </gt>
+                </td>
+                <td><{$vo.income|showPrice}></td>
+                <td><{$vo.time|date='Y-m-d',###}></td>
+                <td>
+                    <eq name="vo.audit" value="0">
+                        <span style="color:red">未审核</span>
+                    <else />
+                        <neq name="vo.notto" value="0">
+                            <span style="color:#000">
+                            <gt name="vo['price']" value="0">应收<else />应付</gt>：<{$vo.notto|showPrice}></span>
+                        <else />
+                            <span style="color:#CCC">已<gt name="vo.price" value="0">到帐<else />付清</gt></span>
+                        </neq>
+                    </eq>
+                </td>
+                <td>
+                    <present name="can_do['User']['view']">
+                        <a href="__APP__/User/view/id/<{$vo.uid}>"><{$vo['user']['name']}></a>
+                    <else />
+                        <{$vo['user']['name']}>
+                    </present>
+                </td>
+            </tr>
+        </volist>
+        </tr>
+    </table>
+
+</body>
+</html>

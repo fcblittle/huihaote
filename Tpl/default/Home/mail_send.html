@@ -1,0 +1,74 @@
+<include file="Public:header" />
+<h3>个人信箱</h3>
+<div class="tab">
+`   <a href="__URL__/mail">收件箱<span class="red fb"></span></a>
+    <a href="__URL__/mail/type/send" class="action">发件箱<span class="red fb"></span></a>
+    <a href="__URL__/mail/type/new">+新邮件</a>
+</div>
+<link href="../Public/Style/mail.css" rel="stylesheet" type="text/css" />
+
+<table cellpadding="2" cellspacing="0" border="0" class="needhover">
+    <eq name="list|count" value="0">
+    <tr id="empty">
+        <td style="border-bottom:#CCC dashed 1px;">您的发件箱为空。</td>
+    </tr>
+    </eq>
+    <volist name="list" id="vo">
+    <tr onclick="openMail(<{$vo.id}>)" id="mail_<{$vo.id}>">
+        <td class="tf mail">
+            <div class="mailtitle">
+                <p>
+                    <eq name="vo.read" value="0"><span class="red">【未查看】</span></eq>
+                    <present name="vo['newreply']"><span class="red">【新回复】</span></present>
+                    <eq name="vo.system" value="1"><b>系统消息：</b></eq>
+                    <{$vo['title']}>
+                </p>
+                <span class="info">
+                收件人：<{$vo['user']['name']}>&nbsp; | &nbsp;
+                发送时间：<{$vo['time']|timestr=###,1}>&nbsp; | &nbsp;
+                <a href="__URL__/mail/type/del/id/<{$vo['id']}>">删 除</a>
+                </span>
+            </div>
+            <div class="mailcontent">
+                <div class="content"><{$vo.content|text}></div>
+                <dl class="reply">
+                    <neq name="vo.reply" value="0">
+                        <sublist name="vo.reply" id="so">
+                        <dt><span><{$so['writer']['name']}></span> <{$so['title']}></dt>
+                        <dd>
+                            <{$so['content']|text}>
+                        </dd>
+                        </sublist>
+                    </neq>
+                    <dt>快捷回复：</dt>
+                    <dd>
+                        <textarea id="reply_<{$vo.id}>"></textarea><br />
+                        <input class="button" type="button" style="margin:0px;" onclick="reply(<{$vo.id}>)" value="发 送" />
+                    </dd>
+                </dl>
+            </div>
+        </td>
+    </tr>
+    </volist>
+</table>
+<script type="text/javascript">
+var nic = [];
+function openMail(id){
+    $("#mail_"+id).find(".mailcontent").slideDown();
+    $("#mail_"+id).find(".red").remove();
+    if(nic[id] === undefined)
+    nic[id] = new nicEditor({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','smiley','image']}).panelInstance('reply_'+id);
+    ajax('__URL__/mail', {id:id}, 'get', function(data){});
+}
+function reply(id){
+    var content = nic[id].instanceById('reply_'+id).getContent();
+    ajax('__URL__/mail/', {reply:id, content:content}, 'post', function(data){
+        if(data.status == 1){
+            $("#reply_"+id).parent().prev("dt").before("<dt><span>我</span> 回复:"+$("#mail_"+id+" .mailtitle p").text()+"</dt><dd>"+content+"</dd>");
+        }else{
+            alert(data.info);
+        }
+    });
+}
+</script>
+<include file="Public:footer" />

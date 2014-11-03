@@ -1,0 +1,83 @@
+<include file="Public:header" />
+<h3>货品添加</h3>
+
+<form action="__URL__/add/url/<{$url}>" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+        <tr>
+            <th colspan="2">基本资料</th>
+        </tr>
+        <tr>
+            <td width="100">品 名<em>*</em></td>
+            <td class="tf"><input type="text" style="width:250px;" name="name" /></td>
+        </tr>
+        <tr>
+            <td>编 码</td>
+            <td class="tf"><input type="text" style="width:250px;" name="num" /></td>
+        </tr>
+        <tr>
+            <td>分 类</td>
+            <td class="tf">
+                <select name="type">
+                    <sublist name="types" id="vo">
+                        <option value="<{$vo['id']}>"><{$vo['levelstr']}> <{$vo['name']}></option>
+                    </sublist>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>仓 库</td>
+            <td style="text-align:left;">
+                <select multiple="multiple" style="width:250px;" name="group[]">
+                    <iterate name="groups" id="vo">
+                        <option value="<{$vo['gid']}>"><{$vo['levelstr']}> <{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>型 号</td>
+            <td class="tf"><input type="text" style="width:250px;" name="model" /></td>
+        </tr>
+        <tr>
+            <td>销售价格</td>
+            <td class="tf"><input type="text" style="width:250px;" name="price" /></td>
+        </tr>
+        <tr>
+            <td>采购价格</td>
+            <td class="tf"><input type="text" style="width:250px;" name="cost" /></td>
+        </tr>
+        <tr>
+            <td>数量单位</td>
+            <td class="tf"><input type="text" style="width:250px;" name="unit" value="" /></td>
+        </tr>
+        <present name="extend">
+        <tr>
+            <th colspan="2">扩展资料</th>
+        </tr>
+        <volist name="extend" id="vo">
+        <tr>
+             <td><{$vo['name']}></td>
+             <td class="tf">
+                <switch name="vo['type']">
+                <case value="text"><input type="text" style="width:250px;" name="info[]" /></case>
+                <case value="textarea"><textarea name="info[]" style="width:350px; height:200px;"></textarea></case>
+                <case value="file"><input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'file', '__APP__/Public/ajaxUpload')" value="" /></case>
+                <case value="pic"><input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'pic', '__APP__/Public/ajaxUpload')" value="" /></case>
+                </switch>
+             </td>
+        </tr>
+        </volist>
+        </present>
+    </table>
+    <input type="submit" class="button" value="保 存" />
+    <eq name="url" value="">
+    <input type="button" class="button" onclick="location.href='__URL__/index'" value="返 回" />
+    <else />
+    <input type="button" class="button" onclick="location.href='__APP__/<{$url}>/add/do/1'" value="返 回" />
+    </eq>
+</form>
+
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'})
+</script>
+<include file="Public:footer" />

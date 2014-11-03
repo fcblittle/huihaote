@@ -1,0 +1,52 @@
+<include file="Public:header" />
+<h3>个人信箱</h3>
+<div class="tab">
+`   <a href="__URL__/mail">收件箱<span class="red fb"></span></a>
+    <a href="__URL__/mail/type/send">发件箱<span class="red fb"></span></a>
+    <a href="__URL__/mail/type/new" class="action">+新邮件</a>
+</div>
+
+<form action="__URL__/mail" method="post">
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <td width="150">发送人</td>
+        <td class="tf">
+            <input type="text" id="userBox" style="width:500px;" name="name" value="" />
+            <input type="button" onclick="searchUser()" value="添加联系人" />
+        </td>
+    </tr>
+    <tr>
+        <td width="150">邮件标题</td>
+        <td class="tf"><input type="text" style="width:600px;" name="title" value="" /></td>
+    </tr>
+    <tr>
+        <td width="150">邮件内容</td>
+        <td class="tf"><textarea style="width:600px; height:300px;" name="content"></textarea></td>
+    </tr>
+</table>
+<input type="submit" class="button" value="发 送" />
+</form>
+
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'});
+function searchUser(){
+    ajax("__APP__/User/index/search/1/all/1", {search:1}, 'post', function(data){
+        if(data.status == 1){
+            var html = '';
+            for(x in data.data){
+                html += '<a id="usr_'+data.data[x].uid+'" title="编号：'+data.data[x].num+'" href="javascript:addMem('+data.data[x].uid+')">'+data.data[x].name+'('+data.data[x].num+')'+'</a>&nbsp;'
+            }
+            win('请选择搜索用户结果', html);
+        }else{
+            alert("数据错误，请重试！");
+        }
+    });
+}
+function addMem(uid){
+    var name = $("#userBox").val().split(",");
+    name[name.length] = $("#usr_"+uid).text();
+    $("#userBox").val(name.join(','));
+    closeWin();
+}
+</script>
+<include file="Public:footer" />

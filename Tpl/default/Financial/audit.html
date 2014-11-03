@@ -1,0 +1,90 @@
+<include file="Public:header" />
+<h3>收支详单查看</h3>
+<form method="POST" action="">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+        <tr>
+            <th colspan="2">基本数据</th>
+        </tr>
+        <tr>
+            <td>收支项目</td>
+            <td class="tf"><{$name|text}></td>
+        </tr>
+        <tr>
+            <td>金　额</td>
+            <td class="tf"><{$price|showPrice}></td>
+        </tr>
+        <tr>
+            <td>方 式</td>
+            <td class="tf">
+                <select id="way" name="way" onchange="showBank()">
+                    <option value="0" <eq name="way" value="0">selected="selected"</eq>>现金</option>
+                    <option value="1" <eq name="way" value="1">selected="selected"</eq>>银行</option>
+                </select>
+            </td>
+        </tr>
+        <tr id="bank" <if condition="!$bank">style="display:none;"</if>>
+            <td>银 行</td>
+            <td class="tf">
+                <select name="bank">
+                    <iterate name="banks" id="vo">
+                        <option value="<{$vo['id']}>" <eq name="bank" value="$vo['id']">selected="selected"</eq>><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>做账日期</td>
+            <td class="tf"><{$time|date='Y-m-d',###}></td>
+        </tr>
+        <tr>
+            <td>到账状态</td>
+            <td class="tf">
+                <eq name="audit" value="0">
+                    <span style="color:red">未审查</span>
+                <else />
+                    <eq name="notto" value="0">
+                        <span style="color:red">欠账：<{$notto|showPrice}></span>
+                    <else />
+                        已<gt name="price" value="0">到帐<else />付清</gt>
+                    </eq>
+                </eq>
+            </td>
+        </tr>
+        <present name="extend">
+            <tr>
+                <th colspan="2">订单资料</th>
+            </tr>
+            <volist name="extend" id="vo">
+                <tr>
+                    <td><{$vo['name']}></td>
+                    <td class="tf"></td>
+                </tr>
+            </volist>
+        </present>
+    </table>
+    <div style="width:500px; text-align:right; margin:5px 0px; color:#999;">
+        录入者：
+        <present name="can_do['User']['view']">
+            <a href="__APP__/User/view/id/<{$uid}>" style="color:#999;"><{$user['name']}></a>
+        <else />
+            <{$user['name']}>
+        </present>&nbsp;┊&nbsp;
+        录入时间：
+        <{$rtime|timestr}>
+    </div>
+    <input type="hidden" name="id" value="<{$id}>" />
+    <input type="submit" class="button" value="审 核" />
+</form>
+
+<script type="text/javascript">
+function showBank()
+{
+    var way = $("#way").val();
+    if(way > 0){
+        $("#bank").show();
+    }else{
+        $("#bank").hide();
+    }
+}
+</script>
+<include file="Public:footer" />

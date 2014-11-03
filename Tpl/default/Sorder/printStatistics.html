@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>打印</title>
+<style>
+	.limit{width:680px; margin-top:20px; color:#000; font-size:12px;}
+	.clear{ clear:both; height:0px; overflow:hidden; }
+	.table {border-left:1px solid #333; border-top:1px solid #333;}
+	.table td{border-right:1px solid #333; border-bottom:1px solid #333; line-height:20px; height:20px; font-size:12px; text-align:center;}
+	#ixcore_run_time{ display:none;}
+	#ixcore_page_trace{ display:none;}
+</style>
+</head>
+
+<body class="limit">
+    <div style="margin-top:10px; font-size:12px;">
+        <img src="./logo.gif" width="50" style="vertical-align:middle;" />
+        <span>青岛惠好特自动化设备有限公司<span>
+    </div>
+
+    <h1 style="text-align:center; font-size:20px; margin:5px 0px;">销售统计</h1><br />
+
+    <div style="height:30px; line-height:30px; width:100%; margin:5px;">
+        <div style="width:100%; float:left;">时间： <{$start}> 至 <{$end}></div>
+    </div>
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" class="table">
+        <tr>
+            <td>单 号</td>
+            <td>客 户</td>
+            <td>销售人员</td>
+            <td width="80">总价</td>
+            <td width="">税率</td>
+            <td width="80">提成</td>
+            <td width="60">状 态</td>
+        </tr>
+        <volist name="list" id="vo">
+        <tr>
+            <td><{$vo.num}></td>
+            <td><{$vo['cors']['name']}></td>
+            <td><{$allUsers[$vo['sale']]['name']}></td>
+            <td><{$vo['total']+$vo['tax_total']|showPrice}></td>
+            <td><{$vo['tax']}>%</td>
+            <td><{$vo['income']|showPrice}></td>
+            <td>
+                <eq name="vo['over']" value="0">
+                    <span style="color:red">未结</span>
+                <else />
+                    <span style="color:#CCC">完结</span>
+                </eq>
+            </td>
+        </tr>
+        </volist>
+        <tr>
+            <td colspan="3">总计</td>
+            <td><{$total+$taxTotal|showPrice}></td>
+            <td><{$income|showPrice}></td>
+            <td width="80">&nbsp;</td>
+        </tr>
+    </table>
+</body>
+</html>

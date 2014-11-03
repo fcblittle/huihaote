@@ -1,0 +1,67 @@
+<include file="Public:header" />
+<h3><{$name}>资料设置<span>(设置数据扩展资料信息，修改将影响所有已有资料)</span></h3>
+<div style="padding:10px;">
+    <a href="__URL__/info/type/1">用户资料</a> &nbsp;| &nbsp;
+    <a href="__URL__/info/type/2">仓库资料</a> &nbsp;| &nbsp;
+    <a href="__URL__/info/type/3">货品资料</a> &nbsp;| &nbsp;
+    <a href="__URL__/info/type/4">客户资料</a> &nbsp;| &nbsp;
+    <a href="__URL__/info/type/5">供应商资料</a>
+</div>
+
+<form action="__URL__/info" method="post">
+<table cellpadding="2" cellspacing="1" border="0" style="width:300px;" id="linebox">
+    <tr>
+        <th>添加项</th>
+        <th>类型</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><input name="name[]" type="text" value="<{$vo['name']}>" /></td>
+        <td>
+            <select name="type[]">
+                <eq name="vo['type']" value="text">
+                <option value="text" selected="selected">填空</option>
+                <else />
+                <option value="text">填空</option>
+                </eq>
+                <eq name="vo['type']" value="textarea">
+                <option value="textarea" selected="selected">文本区</option>
+                <else />
+                <option value="textarea">文本区</option>
+                </eq>
+                <eq name="vo['type']" value="file">
+                <option value="file" selected="selected">文件</option>
+                <else />
+                <option value="file">文件</option>
+                </eq>
+                <eq name="vo['type']" value="pic">
+                <option value="pic" selected="selected">图片</option>
+                <else />
+                <option value="pic">图片</option>
+                </eq>
+            </select>
+        </td>
+    </tr>
+    </volist>
+    <tr>
+        <td><input name="name[]" type="text" value="" /></td>
+        <td>
+            <select name="type[]">
+                <option value="text">填空</option>
+                <option value="textarea">文本区</option>
+                <option value="file">文件</option>
+                <option value="pic">图片</option>
+            </select>
+        </td>
+    </tr>
+</table>
+<input type="hidden" name="key" value="<{$type}>" />
+<input type="button" class="button" onclick="addline()" value="增 加" />
+<input type="submit" class="button" value="保 存" />
+</form>
+<script type="text/javascript">
+function addline(){
+    $("#linebox").append($("#linebox tr:last").clone());
+}
+</script>
+<include file="Public:footer" />

@@ -1,0 +1,95 @@
+<include file="Public:header" />
+<h3>银行调拨查看</h3>
+
+<table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+    <tr>
+        <th colspan="2">基本数据</th>
+    </tr>
+    <tr>
+        <td>单 号</td>
+        <td class="tf"><{$num}></td>
+    </tr>
+
+    <tr>
+        <td>调出银行</td>
+        <td class="tf">
+            <present name="frombank">
+                <{$frombank}>
+            <else/>
+                库存现金
+            </present>
+        </td>
+    </tr>
+
+    <tr>
+        <td>调入银行</td>
+        <td class="tf">
+            <present name="tobank">
+                <{$tobank}>
+            <else/>
+                库存现金
+            </present>
+        </td>
+    </tr>
+
+    <tr>
+        <td>调拨日期</td>
+        <td class="tf"><{$time|date='Y-m-d', ###}></td>
+    </tr>
+
+    <tr>
+        <td>调拨金额</td>
+        <td class="tf"><{$money|showPrice}>  元</td>
+    </tr>
+
+    <tr>
+        <td>经办人</td>
+        <td class="tf"><{$username}></td>
+    </tr>
+
+    <tr>
+        <td>简单描述</td>
+        <td class="tf"><{$describe}></td>
+    </tr>
+</table>
+<div style="width:500px;">
+    <div class="f">
+        <input type="button" class="button" onclick="history.go(-1);" value="返 回" />
+    </div>
+
+    <div class="r">
+        <!--打印选项：<select id="title">
+                    <option value="收款" <eq name="title" value="收款">selected="selected"</eq>>收款</option>
+                    <option value="付款" <eq name="title" value="付款">selected="selected"</eq>>付款</option>
+                    <option value="转账" <eq name="title" value="转账">selected="selected"</eq>>转账</option>
+                </select>
+                <select id="in">
+                    <option value="借方" <eq name="in" value="借方">selected="selected"</eq>>借方</option>
+                    <option value="贷方" <eq name="in" value="贷方">selected="selected"</eq>>贷方</option>
+                </select>
+                <select id="su">
+                    <option>选择</option>
+                    <option value="现金" <eq name="su" value="现金">selected="selected"</eq>>现金</option>
+                    <iterate name="banks" id="vo">
+                        <option value="<{$vo['name']}>" <eq name="su" value="$vo['name']">selected="selected"</eq>><{$vo['name']}></option>
+                    </iterate>
+                </select>
+                <!--select id="su" style="width:100px;">
+                    <iterate name="subjects" id="vo">
+                        <option value="<{$vo['name']}>"><{$vo['name']}></option>
+                    </iterate>
+                </select-->
+        <input type="button" class="button" onclick="print()" value="打 印" />
+    </div>
+</div>
+
+<script type="text/javascript">
+function print()
+{
+    var t = $("#title").val();
+    var i = $("#in").val();
+    var s = $("#su").val();
+    location.href='__URL__/printAllot/id/<{$id}>/t/'+t+'/i/'+i+'/s/'+s;
+}
+</script>
+<include file="Public:footer" />

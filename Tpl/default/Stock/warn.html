@@ -1,0 +1,128 @@
+<include file="Public:header" />
+<h3>库存报警</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/warn" method="post">
+    <volist name="list" id="lo">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">报警信息</th>
+        </tr>
+        <tr>
+            <td width="100">产　品<em>*</em></td>
+            <td class="tf">
+                <select class="goods_type" style="width:150px;"></select>
+                <select name="goods[]" class="goods" id="<{$lo['goods']}>" style="width:300px;"></select>
+            </td>
+        </tr>
+        <tr>
+            <td>仓　库<em>*</em></td>
+            <td class="tf">
+                <select name="group[]">
+                    <sublist name="group" id="vo">
+                    <eq name="vo['gid']" value="$lo['group']">
+                    <option value="<{$vo['gid']}>" selected="selected"><{$vo['levelstr']}><{$vo['name']}></option>
+                    <else />
+                    <option value="<{$vo['gid']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+                    </eq>
+                    </sublist>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>数　量<em>*</em></td>
+            <td class="tf"><input type="text" style="width:200px;" name="num[]" value="<{$lo['num']}>" /></td>
+        </tr>
+    </table>
+    </volist>
+
+
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">报警信息</th>
+        </tr>
+        <tr>
+            <td width="100">产　品<em>*</em></td>
+            <td class="tf">
+                <select class="goods_type" style="width:150px;"></select>
+                <select name="goods[]" class="goods" style="width:300px;"></select>
+            </td>
+        </tr>
+        <tr>
+            <td>仓　库<em>*</em></td>
+            <td class="tf">
+                <select name="group[]">
+                    <volist name="group" id="vo">
+                    <option value="<{$vo['gid']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+                    </volist>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>数　量<em>*</em></td>
+            <td class="tf"><input type="text" style="width:200px;" name="num[]" /></td>
+        </tr>
+        <tr id="tempAdd">
+            <td colspan="2" class="tr"><a href="javascript:addWarn();">添加新报警</a></td>
+        </tr>
+    </table>
+    <input type="submit" class="button" value="保 存" />
+    <input type="button" class="button" onclick="location.href='__URL__/index'" value="返 回" />
+</form>
+
+<script type="text/javascript">
+function addWarn(){
+    var clone = $("#tempAdd").parentsUntil("table").clone();
+    $("#tempAdd").parentsUntil("table").after( clone );
+    $("#tempAdd").parentsUntil("table").find('#tempAdd').remove();
+}
+
+$(document).ready(function(){
+    ajax("__APP__/Goods/index", {type:1}, 'post', function(data){
+        if(data.status){
+            for(x in data.data.type){
+                var t = data.data.type[x];
+                $(".goods_type").append("<option value='"+t.id+"'>"+t.levelstr+t.name+"</option>");
+            }
+            $(".goods").append("<option value=''>请选择...</option>");
+            var status = '<{$abs}>';
+            for(x in data.data.list){
+                var t = data.data.list[x];
+                var p = status ? t.cost : t.price;
+                $(".goods").append("<option  class='"+t.type+"' key='"+t.unit+"' title='"+ p/100 +"'  value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+            }
+
+            $(".goods").each(function(){
+                var opt = $(this).find("option[value='"+$(this).attr("id")+"']");
+                opt.attr("selected", true);
+                var type = opt.attr("class");
+                $(this).find("option[class!='"+type+"']").remove();
+                $(this).prev(".goods_type").find("option[value='"+type+"']").attr("selected", true);
+            })
+        }else{
+            alert("查询失败，请重试！");
+        }
+    });
+
+    $(".goods_type").change(function(){
+        var obj = $(this);
+        ajax("__APP__/Goods/index/service/1/type/"+$(this).val(), {type:$(this).val()}, 'post', function(data){
+            if(data.status){
+                var status = '<{$abs}>';
+                obj.nextAll(".goods").html("");
+                obj.nextAll(".goods").append("<option key='' value=''>请选择...</option>");
+                for(x in data.data.list){
+                    var t = data.data.list[x];
+                    var p = status ? t.cost : t.price;
+					p = p/100;
+                    obj.nextAll(".goods").append("<option key='"+t.unit+"' title='"+p+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+                }
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+});
+</script>
+<include file="Public:footer" />

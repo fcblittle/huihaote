@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>打印</title>
+<style>
+	.limit{width:100%; text-align:center;}
+	.header{width:800px; text-align:center;}
+	.header .big{font-size:32px;}
+	.header .small{font-size:12px;}
+	.w50{width:50%;}
+	.w30{width:33%;}
+	.f{float:left; overflow:hidden;}
+	.tl{text-align:left;}
+	.mt10{margin-top:10px;}
+</style>
+</head>
+
+<body class="limit">
+<div class="header">
+    <div class="big">青岛惠好特自动化设备有限公司（库存统计）</div>
+
+    <div class="tl mb10">
+    	<div class="w30 f">
+    	   货品:
+    	   <{$_group['name']}>
+    	   <if condition="$_goods_type">--<{$_goods_type['name']}></if>
+    	   <if condition="$_goods">--<{$_goods['name']}></if>
+    	</div>
+    	<div class="w30 f">时间:
+    	   <if condition="$start"><{$start}> 至 <{$end}></if>
+        </div>
+    </div>
+    <table width="100%" cellpadding="0" cellspacing="0" border="1" class="needhover">
+        <tr>
+            <th>产品名称</th>
+            <th>总 量</th>
+            <eq name="colspan" value="6">
+                <th>初始量</th>
+                <th>进量</th>
+                <th>采购价格</th>
+                <th>采购总价<?php $costTotal = 0; ?></th>
+                <th>出量</th>
+                <th>销售价格<?php $priceTotal = 0; ?></th>
+                <th>销售总价</th>
+            <else />
+                <th>采购价格</th>
+                <th>采购总价<?php $costTotal = 0; ?></th>
+                <th>销售价格<?php $priceTotal = 0; ?></th>
+                <th>销售总价</th>
+            </eq>
+        </tr>
+        <volist name="list" id="vo">
+            <tr>
+                <td><{$allgoods[$vo['goods']]['name']}></td>
+                <td><{$vo.sum}> <{$allgoods[$vo['goods']]['unit']}></td>
+                <eq name="colspan" value="6">
+                <td><{$vo.start}> <{$allgoods[$vo['goods']]['unit']}></td>
+                <td><{$vo.in}> <{$allgoods[$vo['goods']]['unit']}></td>
+                <td><?php echo showPrice($allgoods[$vo['goods']]['cost']); ?></td>
+                <td><?php echo showPrice($vo['in'] * $allgoods[$vo['goods']]['cost']); $costTotal += $vo['in'] * $allgoods[$vo['goods']]['cost']; ?></td>
+                <td><{$vo.out}> <{$allgoods[$vo['goods']]['unit']}></td>
+                <td><?php echo showPrice($allgoods[$vo['goods']]['price']); ?></td>
+                <td><?php echo showPrice($vo['out'] * $allgoods[$vo['goods']]['price']); $priceTotal += $vo['out'] * $allgoods[$vo['goods']]['price']; ?></td>
+                <else />
+                <td><?php echo showPrice($allgoods[$vo['goods']]['cost']); ?></td>
+                <td><?php echo showPrice($vo['sum'] * $allgoods[$vo['goods']]['cost']); $costTotal += $vo['sum'] * $allgoods[$vo['goods']]['cost']; ?></td>
+                <td><?php echo showPrice($allgoods[$vo['goods']]['price']); ?></td>
+                <td><?php echo showPrice($vo['sum'] * $allgoods[$vo['goods']]['price']); $priceTotal += $vo['sum'] * $allgoods[$vo['goods']]['price']; ?></td>
+                </eq>
+            </tr>
+        </volist>
+        <tr class="white page">
+            <td colspan="9" class="tl"><{$page}></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

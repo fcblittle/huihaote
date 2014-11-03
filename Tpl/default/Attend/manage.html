@@ -1,0 +1,66 @@
+<include file="Public:header" />
+<h3>我的考勤列表</h3>
+
+<div style="padding:10px; text-align:right;">
+        <select name="year" id="year">
+            <?php  $year = date('Y'); for($i=2010; $i<=$year; $i++){ ?>
+            <eq name="i" value="$nowyear">
+                <option value="<{$i}>" selected="selected"><{$i}></option>
+            <else />
+                <option value="<{$i}>"><{$i}></option>
+            </eq>
+            <?php } ?>
+        </select> 年
+        <select name="month" id="month" onchange="gotoDate()">
+            <?php $month = date('n'); for($i=1; $i<=12; $i++){ ?>
+            <eq name="i" value="$nowmonth">
+                <option value="<{$i}>" selected="selected"><{$i}></option>
+            <else />
+                <option value="<{$i}>"><{$i}></option>
+            </eq>
+            <?php } ?>
+        </select> 月
+</div>
+
+<table cellpadding="2" cellspacing="1" border="0" class="needhover" style="width:100%;">
+    <tr>
+        <th width="100" rowspan="2">用 户</th>
+        <th colspan="<{$date|count}>">日 期</th>
+    </tr>
+    <tr>
+        <volist name="date" id="vo">
+        <th width="30"><{$vo}></th>
+        </volist>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><{$vo['name']}></td>
+        <sublist name="vo['attend']" id="so">
+        <td style="font-size:10px;">
+            <div>
+                <eq name="so['on']" value="">
+                    <span class="red">-</span>
+                <else />
+                    <{$so['on']|date="H:i",###}>
+                </eq>
+            </div>
+            <div>
+                <eq name="so['off']" value="">
+                    <span class="red">-</span>
+                <else />
+                    <{$so['off']|date="H:i",###}>
+                </eq>
+            </div>
+        </td>
+        </sublist>
+    </tr>
+    </volist>
+</table>
+
+<script type="text/javascript">
+function gotoDate(){
+    location.href="__URL__/index/date/"+$("#year").val()+"-"+$("#month").val();
+}
+</script>
+
+<include file="Public:footer" />

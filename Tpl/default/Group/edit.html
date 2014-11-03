@@ -1,0 +1,68 @@
+<include file="Public:header" />
+<h3>仓库股资料修改</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/edit" method="post" enctype="multipart/form-data">
+<table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+    <tr>
+        <th colspan="2">基本资料</th>
+    </tr>
+    <tr>
+        <td>名 称</td>
+        <td class="tf"><input type="text" style="width:250px;" name="name" value="<{$name}>" /></td>
+    </tr>
+    <tr title="用于快捷查询用户的职工号或身份证号码等。">
+        <td>电 话</td>
+        <td class="tf"><input type="text" style="width:250px;" name="tel" value="<{$tel}>" /></td>
+    </tr>
+    <tr>
+        <td>地 址</td>
+        <td class="tf"><input type="text" style="width:250px;" name="address" value="<{$address}>" /></td>
+    </tr>
+
+    <present name="extend">
+    <tr>
+        <th colspan="2">扩展资料</th>
+    </tr>
+    <volist name="extend" id="vo">
+    <tr>
+         <td><{$vo['name']}></td>
+         <td class="tf">
+            <switch name="vo['type']">
+            <case value="text"><input type="text" style="width:250px;" name="info[]" value="<{$info[$key]}>" /></case>
+            <case value="textarea"><textarea name="info[]" style="width:350px; height:200px;"><{$info[$key]}></textarea></case>
+            <case value="file">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>">点击查看文件</a>
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" onchange="upload('<{$key}>', 'file', '__APP__/Public/ajaxUpload')" />
+                <else />
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" onchange="upload('<{$key}>', 'file', '__APP__/Public/ajaxUpload')" />
+                </neq>
+            </case>
+            <case value="pic">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>"><img src=".<{$info[$key]}>" /></a>
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'pic', '__APP__/Public/ajaxUpload')" />
+                <else />
+                    <input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'pic', '__APP__/Public/ajaxUpload')" />
+                </neq>
+            </case>
+            </switch>
+         </td>
+    </tr>
+    </volist>
+    </present>
+</table>
+<input type="hidden" name="id" value="<{$gid}>" />
+<input type="submit" class="button" value="保 存" />
+</form>
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'});
+function changeInput(obj){
+    var hide = $(obj).parent().find("input:hidden");
+    var name = hide.attr("name");
+    hide.remove();
+    $(obj).parent().append('<input type="file" style="width:250px;" name="'+name+'" />');
+}
+</script>
+<include file="Public:footer" />

@@ -1,0 +1,88 @@
+<include file="Public:header" />
+<h3>拆分列表</h3>
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>单 号</th>
+        <th>备注</th>
+        <th width="80">申请人</th>
+        <th width="120">申请时间</th>
+        <th width="120">状态</th>
+        <th width="170">操 作</th>
+    </tr>
+    <volist name="list" id="vo">
+        <tr>
+            <td><{$vo.num}></td>
+            <td><{$vo.comment}></td>
+            <td><{$vo['user']['name']}></td>
+            <td><{$vo.time|date='Y-m-d　H:i',###}></td>
+            <td><eq name="vo['audit']" value="0">未审核<else />已审核</eq></td>
+            <td>
+                <present name="can_do[$mname]['view']">&nbsp;┊&nbsp;<a href="__URL__/view/id/<{$vo.id}>">查 看</a></present>
+                <present name="can_do[$mname]['edit']">&nbsp;┊&nbsp;<a href="__URL__/edit/id/<{$vo.id}>">修 改</a></present>
+                <present name="can_do[$mname]['delete']">&nbsp;┊&nbsp;<a href="__URL__/delete/id/<{$vo.id}>">删 除</a></present>
+                &nbsp;┊&nbsp;
+            </td>
+        </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="6" class="tr"><{$page}></td>
+    </tr>
+</table>
+<present name="can_do[$mname]['add']"><input type="button" class="button" onclick="location.href='__URL__/add/do/1'" value="添 加" /> &nbsp;</present>
+<notpresent name="search">
+    <input class="button" type="button" onclick="openSearch()" value="搜 索" />
+<else />
+    <input class="button" onclick="location.href='__URL__/<present name='url'><{$url}><else />index</present>'" type="button" value="返 回" />
+</notpresent>
+
+<form id="Search" action="__URL__/index" method="get" style="border:#CCC solid 1px; background:#FFF; padding:10px; margin-top:20px; width:300px; display:none;">
+    <label style="display:block; height:30px;">单　号：<input name="num" style="width:200px;" type="input" /></label>
+    <eq name="abs" value="1">供应商<else />客　户</eq>：
+    	<select id="searchselect">
+         <volist name="DB_type" id="vo">
+         	<option value="<{$vo['id']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+         </volist>
+        </select>
+
+    	<select name="cors" id="showlist">
+            <option value="">请选择...</option>
+            <volist name="cors" id="vo">
+            <option value="<{$vo['id']}>"><{$vo['name']}></option>
+            </volist>
+       </select>
+    <input class="button" name="search" type="submit" value="搜 索" />
+</form>
+<script type="text/javascript">
+function openSearch(){
+    $("#Search").show();
+}
+$(document).ready(function(){
+	$("#searchselect").change(function(){
+		$("#showlist option").remove();
+		var type = $(this).val();
+		if("<{$types}>" ==1)
+			var types = "__APP__/Supplier/index";
+			else
+			var types = "__APP__/Client/index";
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+				}else{
+					alert("121");
+				}
+	   		},
+			'json'
+	   );
+
+    });
+});
+</script>
+<include file="Public:footer" />

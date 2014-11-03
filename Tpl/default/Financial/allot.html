@@ -1,0 +1,111 @@
+<include file="Public:header" />
+<h3>银行调拨列表</h3>
+<form action="__URL__/allot" style="padding-bottom:10px;">
+    经办人：
+    <select name="user">
+        <option value="0">全部</option>
+        <iterate name="users" id="vo">
+            <option value="<{$vo['uid']}>" <eq name="user" value="$vo['uid']">selected="selected"</eq>><{$vo['name']}></option>
+        </iterate>
+    </select>　　
+    时 间：
+    <input type="text" style="width:100px;" name="stime" readonly="readonly" onclick="showdatebox(this,'')" value="<{$stime}>" /> --
+    <input type="text" style="width:100px;" name="etime" readonly="readonly" onclick="showdatebox(this,'')" value="<{$etime}>" />
+    <input type="submit" value="查 询" />
+    <!--input type="submit" name="ac" value="导 出" />
+    <input type="submit" name="ac" value="打 印" /-->　
+    <present name="can_do['Financial']['addAllot']">
+        <input type="button" class="button" onclick="location.href='__URL__/addAllot'" value="添 加" /> &nbsp;
+    </present>
+</form>
+
+<!--div style="height:30px; line-height:30px; padding-left:20px;">
+    期初余额: <{$begin|showPrice}>　
+    收入：<{$income|showPrice}>　
+    支出：<{$pay|showPrice}>　
+    阶段总额：
+    <gt name="sum" value="0">
+        <span style="color:green"><{$sum|showPrice}></span>
+    <else />
+        <span style="color:red">-<{$sum|showPrice}></span>
+    </gt>　
+    结存余额:
+    <gt name="total" value="0">
+        <span style="color:green"><{$total|showPrice}></span>
+    <else />
+        <span style="color:red">-<{$total|showPrice}></span>
+    </gt>
+</div-->
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th width="140">单 号</th>
+        <th>调出银行</th>
+        <th>调入银行</th>
+        <th>调拨金额</th>
+        <th width="100">日期</th>
+        <th width="80">经办人</th>
+        <th width="140">操作</th>
+    </tr>
+    <volist name="list" id="vo">
+        <tr>
+            <td><{$vo.num}></td>
+            <td>
+                <gt name="vo['from']" value="0">
+                    <{$banks[$vo['from']]['name']}>
+                <else />
+                    库存现金
+                </gt>
+            </td>
+            <td>
+                <gt name="vo['to']" value="0">
+                    <{$banks[$vo['to']]['name']}>
+                <else />
+                    库存现金
+                </gt>
+            </td>
+            <td><{$vo['money']|showPrice}></td>
+            <td><{$vo['time']|date="Y-m-d", ###}></td>
+            <td><{$vo['user']['name']}></td>
+            <td>
+                
+                <if condition="$vo['audit'] gt 0">
+                    <present name="can_do['Financial']['viewAllot']"><a href="__URL__/viewAllot/id/<{$vo.id}>">查 看</a></present>
+                <else />
+                    <present name="can_do['Financial']['auditAllot']"><a href="__URL__/auditAllot/id/<{$vo.id}>">审 核</a>&nbsp;┊&nbsp;</present>
+                    <present name="can_do['Financial']['editAllot']"><a href="__URL__/editAllot/id/<{$vo.id}>">修 改</a>&nbsp;┊&nbsp;</present>
+                    <present name="can_do['Financial']['delAllot']"><a href="__URL__/delAllot/id/<{$vo.id}>">删 除</a></present>
+                </if>
+            </td>
+        </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="7" class="tr"><{$page}></td>
+    </tr>
+</table>
+
+
+<!--<present name="can_do['Financial']['printDaily']"><input type="button" class="button" onclick="openSearch()" value="打 印" /> &nbsp;</present>-->
+
+<script src="../Public/JS/datebox.js"></script>
+<form id="Search" action="__URL__/printDaily" method="get" style="border:#CCC solid 1px; background:#FFF; padding:10px; margin-top:20px; width:300px; display:none;">
+    时 间：
+    <input type="text" style="width:100px;" name="date1" readonly="readonly" onclick="showdatebox(this,'')" /> -- <input type="text" style="width:100px;" name="date2" readonly="readonly" onclick="showdatebox(this,'')" />
+    <br /><br />
+    从第<input type="text" style="width:40px;" name="firstrow" value="0" />行开始,打印<input type="text" style="width:40px;" name="listrow" value="5" />行！
+    <input type="hidden" name="type" value="daily" />
+    <br /><br />
+    <input class="button"  type="submit" value="打 印" />
+</form>
+
+<script type="text/javascript">
+function openSearch(){
+    $("#Search").show();
+}
+function audit(id){
+    if(window.confirm("该款项已经结清，是否确认？\n如有欠款，可编辑修改")){
+        location.href='__URL__/audit/id/'+id;
+    }
+}
+$("#selectName").change(function(){if($(this).val() == 'other'){$("#nameOther").show();}else{$("#nameOther").hide();} });
+</script>
+<include file="Public:footer" />

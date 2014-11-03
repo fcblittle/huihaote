@@ -1,0 +1,76 @@
+<include file="Public:header" />
+<h3>库存调拨</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/flitting" method='<eq name="step" value="end">post<else />get</eq>'>
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+        <tr>
+            <th colspan="2">调出信息</th>
+        </tr>
+        <tr>
+            <td width="100">转出仓库<em>*</em></td>
+            <td class="tf">
+                <select name="group">
+                    <volist name="group" id="vo">
+                    <option value="<{$vo['gid']}>" <eq name="vo['gid']" value="$gid">selected="selected"</eq>><{$vo['levelstr']}><{$vo['name']}></option>
+                    </volist>
+                </select>
+            </td>
+        </tr>
+        <gt name="step" value="1">
+        <tr>
+            <td>产　品<em>*</em></td>
+            <td class="tf">
+                <select name="goods" id="goods">
+                    <option value="">请选择...</option>
+                    <volist name="goods" id="vo">
+                        <option value="<{$vo['id']}>" key="<{$vo['sum']}>" <eq name="vo['id']" value="$good">selected="selected"</eq>><{$vo['goods_name']}></option>
+                    </volist>
+                </select><span id="goods_num" style="color:red;"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>数　量<em>*</em></td>
+            <td class="tf"><input type="text" style="width:200px;" name="num" value="<{$num}>" /></td>
+        </tr>
+        </gt>
+        <eq name="step" value="end">
+        <tr>
+            <td width="100">转入仓库<em>*</em></td>
+            <td class="tf">
+                <select name="group_in">
+                    <volist name="group" id="vo">
+                    <option value="<{$vo['gid']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+                    </volist>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>调拨日期<em>*</em></td>
+            <td class="tf"><input type="text" style="width:250px;" name="time" value="" readonly="readonly" onclick="showdatebox(this,'')" /></td>
+        </tr>
+        <tr>
+            <td>备　注</td>
+            <td class="tf"><textarea name="comment" style="width:250px;"></textarea></td>
+        </tr>
+        </eq>
+        <neq name="step" value="end">
+        <tr>
+            <td colspan="2" class="tr"><input type="submit" value="下一步 >"></td>
+        </tr>
+        </neq>
+    </table>
+    <eq name="step" value="end">
+    <input type="submit" class="button" value="保 存" />
+    </eq>
+</form>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $("#goods").change(function(){
+        var key = $(this).children("option:selected").attr("key");
+        if(key) $("#goods_num").html(" 剩余："+key);
+    });
+});
+</script>
+<include file="Public:footer" />

@@ -1,0 +1,141 @@
+<include file="Public:header" />
+<h3>应收应付 添加</h3>
+
+<form action="__URL__/addDebt" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">填写信息</th>
+        </tr>
+        <tr>
+            <td width="90">类型</td>
+            <td class="tf">
+                <select name="type" id="cType">
+                    <option value="client">客户</option>
+                    <option value="supplier">供应商</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td id="cName">客户</td>
+            <td class="tf">
+
+                <select id="supplier" class="supplier" style="display:none;">
+                    <iterate name="supplier" id="vo">
+                        <option value="<{$vo['id']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+                    </iterate>
+                </select>
+                <select id="client" class="client">
+                    <iterate name="client" id="vo">
+                        <option value="<{$vo['id']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+                    </iterate>
+                </select>
+
+                <select id="showlist" name="cors">
+                    <option value="">请选择...</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>添加时间</td>
+            <td class="tf">
+                <input type="text" style="width:150px;" name="time"  onclick="showdatebox(this,'')" value="<{$time|date='Y-m-d',###}>" />
+            </td>
+        </tr>
+        <tr>
+            <td>金额</td>
+            <td class="tf">
+                <input type="text" style="width:100px;" name="money" value="" />
+                <span>付款可写成负数，如-100</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>备 注</td>
+            <td class="tf"><textarea name="comment" style="width:500px; height:80px;"></textarea></td>
+        </tr>
+    </table>
+    <input type="submit" class="button" value="保 存" />
+</form>
+<script src="../Public/JS/datebox.js"></script>
+<script type="text/javascript">
+//new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'})
+
+$(document).ready(function(){
+    $("#cType").change(function(){
+        var type = $(this).val();
+
+        if(type == 'supplier')
+        {
+            $("#client").hide();
+            $("#supplier").show();
+            $("#cName").html('供应商');
+        }else{
+            $("#supplier").hide();
+            $("#client").show();
+            $("#cName").html('客户');
+        }
+    });
+
+	$("#client").change(function(){
+    	$("#showlist option").remove();
+		var type = $(this).val();
+		var types = "__APP__/Client/index";
+
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+				}else{
+					alert("121");
+				}
+	   		},
+			'json'
+	   );
+    });
+
+    $("#supplier").change(function(){
+    	$("#showlist option").remove();
+		var type = $(this).val();
+		var types = "__APP__/Supplier/index";
+
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+				}else{
+					alert("121");
+				}
+	   		},
+			'json'
+	   );
+    });
+
+});
+
+function showBank()
+{
+    var way = $("#way").val();
+    if(way > 0){
+        $("#bank").show();
+    }else{
+        $("#bank").hide();
+    }
+}
+
+showBank();
+</script>
+<include file="Public:footer" />

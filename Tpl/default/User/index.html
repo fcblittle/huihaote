@@ -1,0 +1,100 @@
+<include file="Public:header" />
+<h3>人员列表</h3>
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th width="20%">用户名</th>
+        <th width="10%">姓名</th>
+        <th>编号</th>
+        <th width="10%">角色</th>
+        <th width="15%">最后登录时间</th>
+        <th width="200">操作</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><{$vo.username}> &nbsp; <span style="color:#CCC">(id:<{$vo.uid}>)</span></td>
+        <td><{$vo.name}></td>
+        <td><{$vo.num}></td>
+        <td id="role_<{$vo.uid}>"><{$vo.role|implode=',',###}></td>
+        <td><{$vo.lasttime|timestr}></td>
+        <td>
+            <neq name="vo.uid" value="1">
+                <eq name="vo.lock" value="0">
+                    <present name="can_do['User']['view']">&nbsp;┊&nbsp;<a href="__URL__/view/id/<{$vo.uid}>">查 看</a></present>
+                    <present name="can_do['User']['edit']">&nbsp;┊&nbsp;<a href="__URL__/edit/id/<{$vo.uid}>">修 改</a></present>
+                    <present name="can_do['User']['delete']">&nbsp;┊&nbsp;<a href="__URL__/delete/id/<{$vo.uid}>">删 除</a></present>
+                    <present name="can_do['User']['role']">&nbsp;┊&nbsp;<a href="javascript:role(<{$vo.uid}>)">角 色</a></present>
+                    &nbsp;┊&nbsp;
+                <else />
+                    <eq name="_SESSION['uid']" value="1">
+                    &nbsp;┊&nbsp;<a href="__URL__/edit/id/<{$vo.uid}>">修 改</a>
+                    &nbsp;┊&nbsp;<a href="__URL__/delete/id/<{$vo.uid}>">删 除</a>
+                    &nbsp;┊&nbsp;
+                    </eq>
+                </eq>
+            </neq>
+        </td>
+    </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="6" class="tr"><{$page}></td>
+    </tr>
+</table>
+<present name="can_do['User']['add']"><input type="button" class="button" onclick="location.href='__URL__/add'" value="添 加" /> &nbsp;</present>
+<notpresent name="search">
+    <input class="button" type="button" onclick="openSearch()" value="搜 索" />
+<else />
+    <input class="button" onclick="location.href='__URL__/index'" type="button" value="返 回" />
+</notpresent>
+
+<form id="Search" action="__URL__/index" method="get" style="border:#CCC solid 1px; background:#FFF; padding:10px; margin-top:20px; width:300px; display:none;">
+    <label style="display:block; height:30px;">用户名：<input name="username" style="width:200px;" type="input" /></label>
+    <label style="display:block; height:30px;">姓　名：<input name="name" style="width:200px;" type="input" /></label>
+    <label style="display:block; height:20px;">编　号：<input name="num" style="width:200px;" type="input" /></label>
+    <input class="button" name="search" type="submit" value="搜 索" />
+</form>
+<script type="text/javascript">
+function openSearch(){
+    $("#Search").show();
+}
+function role(id){
+    ajax('__URL__/role', {id:id}, 'get', function(data){
+        if(data.status == 1){
+            var html = "<select id='roleSelect' multiple='multiple' style='width:450px; height:200px; font-size:14px;'>"+
+            "<option value=''>[清除选择]</option>";
+            for(x in data.data){
+                var value = data.data[x];
+                var style = (value.can == 1) ? "" : "color:#CCC;";
+                var sel = "";
+                if(value.selected == 1) {
+                    sel = "selected='selected' ";
+                }
+                html += '<option id="role'+value.id+'" style="'+style+'" '+sel+'value="'+value.id+'" title="'+value.name+'">'+value.levelstr+' '+value.name+'</option>'
+            }
+            html += "</select><br />由于您的权限所限，灰色字体表示无法选择。";
+            var fun = function(){
+                ajax('__URL__/role', {role:$("#roleSelect").val(),id:id}, 'post', function(data){
+                    if(data.status == 1){
+                        if(data.data=='true'){
+                            var name = new Array();
+                            $("#roleSelect option:selected").each(function(i){
+                                name[i] = $(this).attr('title');
+                            });
+                            $("#role_"+id).text(name.join(','));
+                            alert('修改成功');
+                            closeWin();
+                        }else{
+                            closeWin();
+                        }
+                    }else{
+                        alert(data.info);
+                    }
+                });
+            }
+            win('请设定用户角色', html, fun);
+        }else{
+            alert(data.info);
+        }
+    });
+}
+</script>
+<include file="Public:footer" />

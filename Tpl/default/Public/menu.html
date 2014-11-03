@@ -1,0 +1,13 @@
+<dl class="tree">
+    <volist id="mo" name="menu">
+    <dt class="off"><{$mo['name']}></dt>
+    <dd>
+        <ul>
+            <sublist id="mli" name="mo['child']">
+            <li><a href="__APP__/<{$mli['m']}>/<{$mli['a']}>"><{$mli['name']}></a></li>
+            </sublist>
+        </ul>
+    </dd>
+    </volist>
+</dl>
+<div id="hide_control"><span onclick="javascript:tMenu();">&nbsp;</span></div>

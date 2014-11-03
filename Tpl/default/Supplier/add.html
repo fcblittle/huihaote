@@ -1,0 +1,54 @@
+<include file="Public:header" />
+<h3>供应商添加</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/add/url/<{$url}>" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+        <tr>
+            <th colspan="2">基本资料</th>
+        </tr>
+        <tr>
+            <td>公司名</td>
+            <td class="tf"><input type="text" style="width:250px;" name="name" /></td>
+        </tr>
+         <tr>
+            <td>分 类</td>
+            <td class="tf">
+                <select name="type">
+                    <sublist name="types" id="vo">
+                        <option value="<{$vo['id']}>"><{$vo['levelstr']}> <{$vo['name']}></option>
+                    </sublist>
+                </select>
+            </td>
+        </tr>
+        <present name="extend">
+        <tr>
+            <th colspan="2">扩展资料</th>
+        </tr>
+        <volist name="extend" id="vo">
+        <tr>
+             <td><{$vo['name']}></td>
+             <td class="tf">
+                <switch name="vo['type']">
+                <case value="text"><input type="text" style="width:250px;" name="info[]" /></case>
+                <case value="textarea"><textarea name="info[]" style="width:350px; height:200px;"></textarea></case>
+                <case value="file"><input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'file', '__APP__/Public/ajaxUpload')" value="" /></case>
+                <case value="pic"><input type="hidden" name="info[]" value="" /><input type="file" id="file_<{$key}>" name="file_<{$key}>" onchange="upload('<{$key}>', 'pic', '__APP__/Public/ajaxUpload')" value="" /></case>
+                </switch>
+             </td>
+        </tr>
+        </volist>
+        </present>
+    </table>
+    <input type="submit" class="button" value="保 存" />
+    <eq name="url" value="">
+    <input type="button" class="button" onclick="location.href='__URL__/index'" value="返 回" />
+    <else />
+    <input type="button" class="button" onclick="location.href='__APP__/<{$url}>/add/do/1'" value="返 回" />
+    </eq>
+</form>
+
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'})
+</script>
+<include file="Public:footer" />

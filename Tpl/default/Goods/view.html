@@ -1,0 +1,63 @@
+<include file="Public:header" />
+<h3>货品资料查看</h3>
+
+<table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+    <tr>
+        <th colspan="2">基本资料</th>
+    </tr>
+    <tr>
+        <td width="150">姓 名</td>
+        <td class="tf"><{$name}></td>
+    </tr>
+    <tr>
+        <td>编 号</td>
+        <td class="tf">
+            <img src="__URL__/code/num/<{$num}>" />
+            <br />
+            <{$num}>
+        </td>
+    </tr>
+    <tr>
+        <td>预售价格</td>
+        <td class="tf"><{$price|showPrice}></td>
+    </tr>
+    <tr>
+        <td>采购价格</td>
+        <td class="tf"><{$cost|showPrice}></td>
+    </tr>
+    <tr>
+        <td>数量单位</td>
+        <td class="tf"><{$unit}></td>
+    </tr>
+    <present name="extend">
+    <tr>
+        <th colspan="2">扩展资料</th>
+    </tr>
+    <volist name="extend" id="vo" enctype="multipart/form-data">
+    <tr>
+         <td><{$vo['name']}></td>
+         <td class="tf">
+            <switch name="vo['type']">
+            <case value="text"><{$info[$key]|html}></case>
+            <case value="textarea"><{$info[$key]|text}></case>
+            <case value="file">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>">点击查看文件</a>
+                <else />
+                </neq>
+            </case>
+            <case value="pic">
+                <neq name="info[$key]" value="">
+                    <a class="img" href=".<{$info[$key]}>"><img src=".<{$info[$key]}>" /></a>
+                <else />
+                    <span class="img"><img src="../Public/Images/noimage.gif" /></span>
+                </neq>
+            </case>
+            </switch>
+         </td>
+    </tr>
+    </volist>
+    </present>
+</table>
+<input type="button" class="button" onclick="location.href='__URL__/index'" value="返 回" />
+<include file="Public:footer" />

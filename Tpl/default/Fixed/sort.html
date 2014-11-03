@@ -1,0 +1,29 @@
+<include file="Public:header" />
+<h3>固定资产分类设置</h3>
+
+<form action="__ACTION__" method="post">
+<table cellpadding="2" cellspacing="1" border="0" style="width:300px;" id="linebox">
+    <tr>
+        <th>名称</th>
+    </tr>
+    <volist name="list" id="vo">
+        <tr>
+            <td>
+                <input name="name[]" type="text" value="<{$vo['name']}>" />
+                <input name="id[]" type="hidden" value="<{$vo['id']}>" />
+            </td>
+        </tr>
+    </volist>
+    <tr>
+        <td><input name="name[]" type="text" value="" /></td>
+    </tr>
+</table>
+<input type="button" class="button" onclick="addline()" value="增 加" />
+<input type="submit" class="button" value="保 存" />
+</form>
+<script type="text/javascript">
+function addline(){
+    $("#linebox").append($("#linebox tr:last").clone());
+}
+</script>
+<include file="Public:footer" />

@@ -1,0 +1,132 @@
+<include file="Public:header" />
+<div id="ajaxmsg"></div>
+<h3>仓库管理<span>双击可查看仓库详细信息</span></h3>
+<script type="text/javascript" src="../Public/JS/tree.js"></script>
+<table cellpadding="2" cellspacing="0" border="0">
+    <tr class="white">
+        <td>
+            <ul id="treebox">
+            <sublist name="list" id="vo">
+                <li class="level<{$vo['level']}>" id="id<{$vo['gid']}>">
+                    <span class="txt"><{$vo['name']|html}><neq name="vo['lock']" value="0"><input type="hidden" /></neq></span>
+                    <span class="cbox">
+                        <present name="can_do['Group']['add']"><a class="but add" href="javascript:add(<{$vo['gid']}>);">&nbsp;</a></present>
+                        <eq name="vo['lock']" value="0">
+                        <present name="can_do['Group']['delete']"><a class="but del" href="javascript:del(<{$vo['gid']}>);">&nbsp;</a></present>
+                        </eq>
+                   </span>
+                </li>
+            </sublist>
+            </ul>
+        </td>
+    </tr>
+</table>
+<script type="text/javascript">
+    function vol(){return;}
+    var stclose;
+    function closecon(obj){$(".cbox").hide();};
+    $.fn.Ptree.mouseover = function(obj){$(".cbox").hide(); clearTimeout(stclose); $(obj).find(".cbox").show();};
+    $.fn.Ptree.mouseout = function(obj){stclose = setTimeout(closecon,500);};
+    $.fn.Ptree.ondblclick = function(obj){
+        obj = $(obj);
+        var id = parseInt(obj.closest("li").attr("id").slice(2));
+        location.href='__URL__/index/id/'+id;
+    };
+    /*<present name="can_do['Group']['edit']">*/
+    //edit line
+    $.fn.Ptree.onclick = function(obj){
+        obj = $(obj);
+        if(obj.find("input").get()!="") return;
+        var txt = $.trim(obj.text());
+        obj.html('<input class="linput" value="'+txt+'" />');
+        obj.find("input").focus();
+        var id = parseInt(obj.closest("li").attr("id").slice(2));
+        if(!id) return;
+        //add input blur function
+        obj.find("input").blur(function(){
+            if( $(this).val() !="" && $(this).val() != txt){
+                save(this,id,txt,obj);
+            }else{
+                obj.text(txt);
+            }
+        });
+        obj.find("input").keydown(function(event){if(event.which==13) save(this,id);});
+    }
+    /*</present>*/
+    /*<present name="can_do['Group']['add']">*/
+    function add(id){
+        var obj = $("#treebox").addLine({obj:("#id"+id),cla:"linput"});
+        var fun = function(o){
+                if( $(o).val() == ""){
+                    $.fn.Ptree.deleteBox(obj);
+                }else{
+                    save(o,'',id,obj);
+                }
+            }
+        obj.find("input").focus().blur(function(){fun(this)});
+        obj.find("input").keydown(function(event){if(event.which==13){fun(this)}});
+    }
+    /*</present>*/
+    /*<present name="can_do['Group']['delete']">*/
+    function del(id){
+        if(window.confirm("确认删除该部门项么？")){
+            ajax("__URL__/delete", {id:id}, 'post', function(data){
+                if(data.status==1 && data.data=="true"){$("#treebox").delLine("#id"+id);}else{alert("错误提示:"+data.data);}
+            });
+        }
+    }
+    /*</present>*/
+    //save li
+    function save(obj,id,parent,other){
+        var chi = $(obj);
+        var txt = chi.val();
+        //ajax get
+        if(id){
+            /*<present name="can_do['Group']['edit']">*/
+            var url = "__URL__/edit";
+            var data = {id:id,val:txt};
+            var fun = function(data){
+                if(data.status==1 && data.info==""){
+                    chi.parent().text(txt);
+                    return;
+                }else{
+                    if(data.info) alert("错误提示："+data.info)
+                    else if(data.data) alert("错误提示："+data.data);
+                    else alert("修改失败，请刷新重试");
+                    other.text(parent);
+                    return;
+                }};
+            /*</present>*/
+        }else{
+            /*<present name="can_do['Group']['add']">*/
+            var url = "__URL__/add";
+            var data = {val:txt,parent:parent};
+            var fun = function(data){
+                if(data.status==1 && data.info==""){
+                    var o = chi.closest(".txt");
+                    o.text(txt);
+                    o.parent().attr("id","id"+data.data);
+                    var html = '<a class="but add" href="javascript:add('+data.data+');">&nbsp;</a>';
+                    /*<present name="can_do['Group']['delete']">*/
+                    html += '<a class="but del" href="javascript:del('+data.data+');">&nbsp;</a>';
+                    /*</present>*/
+                    o.parent().children(".cbox").html(html);
+                    o.parent().mouseover(function(){$.fn.Ptree.mouseover(this)});
+                    o.parent().mouseout(function(){$.fn.Ptree.mouseout(this)});
+                    o.click(function(){$.fn.Ptree.onclick(this);});
+                    return;
+                }else{
+                    $.fn.Ptree.deleteBox(other);
+                    if(data.info) alert("错误提示："+data.info);
+                    else if(data.data) alert("错误提示："+data.data);
+                    else alert("修改失败，请刷新重试");
+                    return;
+                }
+            };
+            /*</present>*/
+        }
+        ajax(url, data, "post", fun);
+    }
+    $("#treebox").Ptree();
+    </script>
+<include file="Public:footer" />

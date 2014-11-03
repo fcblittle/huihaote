@@ -1,0 +1,10 @@
+<include file="Public:header" />
+<h3>数据表优化<span>(对于频繁删除或变更数据，应该在每个月进行数据冗余清理。)</span></h3>
+
+<div>
+    当前数据表冗余数据为：<{$free}> 字节
+</div>
+<neq name="free" value="0">
+<input type="button" class="button" onclick="location.href='__URL__/optimize/size/<{$free}>'" value="优 化" />
+</neq>
+<include file="Public:footer" />

@@ -1,0 +1,101 @@
+<include file="Public:header" />
+<h3>库存统计</h3>
+<script type="text/javascript" src="../Public/JS/excanvas.pack.js"></script>
+<script type="text/javascript" src="../Public/JS/flot.js"></script>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+
+<div style="padding:0px 10px 10px 0px; margin-bottom:10px; border-bottom:#CCC dashed 1px;">
+    <a href="__URL__/statistics/">仓库存量</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/inout">货品进出量</a> &nbsp;| &nbsp;
+    <a href="__URL__/statistics/type/trend">货品进出量走势</a>
+</div>
+
+<form action="__URL__/statistics/type/trend">
+仓 库：
+<select style="margin-bottom:10px;" name="group">
+    <sublist name="group" id="vo">
+        <option value="<{$vo['gid']}>" <eq name="vo['gid']" value="$gid">selected="selected"</eq> ><{$vo['levelstr']}><{$vo['name']}></option>
+    </sublist>
+</select>
+
+货 品：
+<select style="margin-bottom:10px;" name="goods">
+    <sublist name="allgoods" id="vo">
+        <option value="<{$vo['id']}>" <eq name="vo['id']" value="$goods">selected="selected"</eq> ><{$vo['name']}>(<{$vo['model']}>)</option>
+    </sublist>
+</select>
+
+时 间：
+<input type="text" style="width:100px;" name="stime" readonly="readonly" onclick="showdatebox(this,'')" /> --
+<input type="text" style="width:100px;" name="etime" readonly="readonly" onclick="showdatebox(this,'')" />
+
+<input type="submit" value="查 询" />
+
+</form>
+
+<style type="text/css">
+#content #testbox table{width:auto; background:#FFF; border:#CCC solid 1px;}
+</style>
+
+<div id="testbox" style="width:700px; height:400px; margin-top:10px; float:left;"></div>
+
+<script type="text/javascript">
+function analyze(data){
+    var json = eval("("+data+")");
+    var i = 0;
+    var data = new Array();
+    data['in'] = new Array();
+    data['out'] = new Array();
+    var anticks = new Array();
+    anticks[0] = [0,0];
+    for(x in json){
+        i ++;
+        data['in'][i] = [i, json[x]['in']];
+        data['out'][i] = [i, json[x]['out']];
+        anticks[i] = [i, x];
+    }
+    var andata = [];
+    andata[0] = {data:data['in'],  lines:{show:true}, point:{show:true}, label: "入货量", color:"#FF8800", shadowSize:0};
+    andata[1] = {data:data['out'], lines:{show:true}, point:{show:true}, label: "出货量", color:"#88FF00", shadowSize:0};
+    $.plot($("#testbox"), andata,
+    {
+        grid: {hoverable: true},
+        selection:{mode: "xy"},
+        xaxis:{ticks:anticks, labelWidth:10},
+        yaxis:{tickDecimals:0, autoscaleMargin:0.3},
+        legend:{backgroundOpacity:0.5}
+    });
+}
+analyze('<{$json}>');
+
+function showTooltip(x, y, contents) {
+	$('<div id="tooltip">' + contents + '</div>').css( {
+		position: 'absolute',
+		display: 'none',
+		top: y + 5,
+		left: x + 5,
+		border: '1px solid #333',
+		padding: '2px','background-color': '#FFF',
+		opacity: 0.80
+	}).appendTo("body").fadeIn(200);
+}
+
+var previousPoint = null;
+$("#testbox").bind("plothover", function (event, pos, item) {
+	if (item) {
+		if (previousPoint != item.datapoint) {
+			previousPoint = item.datapoint;
+			$("#tooltip").remove();
+			var y = item.datapoint[1];
+            var x = item.series.xaxis.ticks[item.datapoint[0]]['label'];
+			showTooltip(item.pageX, item.pageY, x+"日为" + y + "<{$unit}>");
+		}
+	}else {
+		$("#tooltip").remove();
+		previousPoint = null;
+	}
+});
+</script>
+
+<include file="Public:footer" />

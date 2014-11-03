@@ -1,0 +1,99 @@
+<include file="Public:header" />
+<h3>出入库记录更改</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/edit" method="post">
+<table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+    <tr>
+        <th colspan="2">基本资料</th>
+    </tr>
+    <tr>
+        <td width="100">产　品</td>
+        <td class="tf"><{$goods['name']}>(<{$goods['model']}>)</td>
+    </tr>
+    <tr>
+        <td>仓　库<em>*</em></td>
+        <td class="tf">
+            <select name="group">
+                <volist name="group" id="vo">
+                <option value="<{$vo['gid']}>" <eq name="vo['gid']" value="$gid">selected="selected"</eq> ><{$vo['levelstr']}><{$vo['name']}></option>
+                </volist>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>数　量<em>*</em></td>
+        <td class="tf"><input type="text" style="width:200px;" name="num" value="<{$num}>" onkeyup="changenum(this);" /> <span id="unit"><{$goods['unit']}></span></td>
+    </tr>
+    <!--以前注释了，现在修改过来了-->
+    <tr>
+        <td>总 价 值<em>*</em></td>
+        <td class="tf">
+            <input type="text" style="width:200px;" id="price" value="<{$price|showPrice}>" name="price" /> <a href="javascript:showCalculator();">>计算器</a>
+            <div id="calculator" style="background:#EEE; padding:10px; margin:10px; display:none;">
+                <input type="text" id="cprice" style="width:50px;" />（单价） * <input id="cnum" type="text" readonly="readonly" style="width:50px;" value="<{$num}>" />（数量） <input type="button" value="计算" onclick="calculator()" />
+            </div>
+        </td>
+    </tr>
+    <if condition="$order">
+        <tr>
+            <td>金额类型<em>*</em></td>
+            <td class="tf">
+                <select name="mType" id="mType">
+                    <option value="实收" <eq name="mType" value="实收">selected="selected"</eq>>实收</option>
+                    <option value="实付" <eq name="mType" value="实付">selected="selected"</eq>>实付</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>金额<em>*</em></td>
+            <td class="tf">
+                <input type="text" name="money" id="money" style="width:100px;" value="<{$money|showPrice}>" />
+            </td>
+        </tr>
+    </if>
+    <!--以前注释了，现在修改过来了-->
+    <tr>
+        <td>记录日期<em>*</em></td>
+        <td class="tf"><input type="text" style="width:250px;" name="time" value="<{$time|date='Y-m-d',###}>" readonly="readonly" onclick="showdatebox(this,'')" /></td>
+    </tr>
+    <tr>
+        <td>备　注</td>
+        <td class="tf"><textarea name="comment" style="width:250px;"><{$comment|text}></textarea></td>
+    </tr>
+</table>
+<div style="width:500px; text-align:right; margin:5px 0px; color:#999;">
+    录入者：
+    <present name="can_do['User']['view']">
+        <a href="__APP__/User/view/id/<{$uid}>" style="color:#999;"><{$user['name']}></a>
+    <else />
+        <{$user['name']}>
+    </present>&nbsp;┊&nbsp;
+    录入时间：
+    <{$rtime|timestr}>
+</div>
+<input type="hidden" name="id" value="<{$id}>" />
+<input type="submit" class="button" value="保 存" />
+<input type="button" class="button" onclick="history.go(-1);" value="返 回" />
+</form>
+
+<script type="text/javascript">
+function showCalculator(){
+    $("#calculator").toggle();
+}
+function changenum(obj){
+    $("#cnum").val($(obj).val());
+}
+function calculator(){
+    if(isNaN(parseFloat($("#cnum").val())) || isNaN(parseFloat($("#cprice").val()))){
+        alert("单价与数量必须为数字！");
+        return;
+    }
+
+    var cnum = parseFloat($("#cnum").val(), 10) * 1;
+    var cprice = Math.round(parseFloat($("#cprice").val(), 10) * 100);
+
+    $("#price").val(cnum * cprice / 100);
+}
+</script>
+<include file="Public:footer" />

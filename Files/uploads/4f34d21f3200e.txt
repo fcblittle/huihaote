@@ -1,0 +1,20 @@
+
+ALTER proc [dbo].[SendSubscribe]
+as
+declare @mailSubject nvarchar(255);
+declare @receiveEmail nvarchar(255);
+declare @sendContent nvarchar(max);
+declare currSend cursor for select MailSubject,ReceiveEmail,SendContent  from MemSubscribeSend where SendTime>=GETDATE()
+open currSend
+fetch next from currSend into @mailSubject,@receiveEmail,@sendContent
+while @@FETCH_STATUS=0
+begin		
+	--print @sendContent
+	
+	exec msdb.dbo.sp_send_dbmail @profile_name='BiztaeEmailCfg',@recipients=@receiveEmail,@subject=@mailSubject,@body=@sendContent,@body_format='html'	
+	waitfor delay '00:00:05';
+	fetch next from currSend into @mailSubject,@receiveEmail,@sendContent
+
+end
+close currSend
+deallocate currSend

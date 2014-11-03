@@ -1,0 +1,44 @@
+<include file="Public:header" />
+<h3>库存详情</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<div style="padding:0px 10px 10px 0px; margin-bottom:10px; border-bottom:#CCC dashed 1px; ">
+    仓库：<{$groupInfo['name']}>&nbsp;&nbsp;&nbsp;&nbsp;
+    商品：<{$goodsInfo['name']}>
+</div>
+
+
+<style type="text/css">
+.cl{ display:block; #padding-left:30%; #text-align:left; text-align:center;}
+</style>
+
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>时间批次</th>
+        <th>所属仓库</th>
+        <th>剩余数量</th>
+        <th>成本单价</th>
+    </tr>
+    <present name="list">
+        <volist name="list" id="vo">
+        <tr>
+            <td>
+               <{$vo['rtime']|date='Y-m-d',###}>
+            </td>
+            <td>
+               <{$vo['groupname']['name']}>
+            </td>
+            <td>
+               <{$vo['num']}>
+            </td>
+            <td>
+               <{$vo['perprice']|showPrice}> 元
+            </td>
+        </tr>
+        </volist>
+    </present>
+    <tr class="white page"><td colspan="10" class="tr"><input type="button" value="返回" onclick="location.href='__URL__/statistics'"></td></tr>
+</table>
+
+
+<include file="Public:footer" />

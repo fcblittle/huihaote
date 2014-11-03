@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Encoding" content="gzip" />
+<title>青岛惠好特--企业进销存管理系统 &rsaquo; <{$title}></title>
+<meta name="author" content="Interidea Team" />
+<meta name="copyright" content="2012 Interidea Co.,Ltd" />
+<link href="../Public/Style/main.css" rel="stylesheet" type="text/css" />
+<link href="../Public/Style/login.css" rel="stylesheet" type="text/css" />
+<script src="../Public/JS/jquery.js" type="text/javascript"></script>
+<script src="../Public/JS/fileuploader.js" type="text/javascript"></script>
+<script src="../Public/JS/main.js" type="text/javascript"></script>
+<script src="../Public/JS/Editor/nicEdit.js" type="text/javascript"></script>
+</head>
+
+
+<body>
+    <div id="header">
+        <div id="logo"><img src="../Public/Images/logo.jpg" /></div>
+        <div id="product"> </div>
+    </div>
+    <div id="main">
+        <div id="topNav">
+            <span id="sayWhat">您好，<{@name}>！</span>
+            <span class="r">
+                <a class="home" href="__APP__/Index/index">返回首页</a>
+                <present name="can_do['Home']['mail']"><a class="mail" href="__APP__/Home/mail">我的邮箱<span></span></a></present>
+                <present name="can_do['Home']['password']"><a class="password" href="__APP__/Home/password">修改密码</a></present>
+                <a class="logout" href="__APP__/Public/logout">退出系统</a>
+            </span>
+        </div>
+        <div id="body">
+            <div id="menu" class="">
+                <include file="Public:menu" />
+            </div>
+            <div id="content">
+                <div id="msg">
+                    <div>
+                    <volist name="inform" id="in">
+                        <a href="__APP__/Home/inform/view/<{$in['id']}>"><{$in['title']}></a>
+                    </volist>
+                    </div>
+                </div>
+                <div id="table">

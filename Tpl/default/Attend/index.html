@@ -1,0 +1,46 @@
+<include file="Public:header" />
+<h3>我的考勤列表</h3>
+
+<div style="padding:10px; text-align:right;">
+        <select name="year" id="year">
+            <?php  $year = date('Y'); for($i=2010; $i<=$year; $i++){ ?>
+            <eq name="i" value="$nowyear">
+                <option value="<{$i}>" selected="selected"><{$i}></option>
+            <else />
+                <option value="<{$i}>"><{$i}></option>
+            </eq>
+            <?php } ?>
+        </select> 年
+        <select name="month" id="month" onchange="gotoDate()">
+            <?php $month = date('n'); for($i=1; $i<=12; $i++){ ?>
+            <eq name="i" value="$nowmonth">
+                <option value="<{$i}>" selected="selected"><{$i}></option>
+            <else />
+                <option value="<{$i}>"><{$i}></option>
+            </eq>
+            <?php } ?>
+        </select> 月
+</div>
+
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th width="20%">日 期</th>
+        <th>登陆时间</th>
+        <th>离开时间</th>
+    </tr>
+    <volist name="list" id="vo">
+    <tr>
+        <td><{$vo.date}></td>
+        <td><{$vo.firsttime|date="h:i:s",###}></td>
+        <td><{$vo.lasttime|date="h:i:s",###}></td>
+    </tr>
+    </volist>
+</table>
+
+<script type="text/javascript">
+function gotoDate(){
+    location.href="__URL__/index/date/"+$("#year").val()+"-"+$("#month").val();
+}
+</script>
+
+<include file="Public:footer" />

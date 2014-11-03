@@ -1,0 +1,133 @@
+<include file="Public:header" />
+<h3>应收应付 修改</h3>
+
+<form action="__URL__/editDebt" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">填写信息</th>
+        </tr>
+        <tr>
+            <td width="90">类型</td>
+            <td class="tf">
+                <eq name="cType" value="client">客户</eq>
+                <eq name="cType" value="supplier">供应商</eq>
+            </td>
+        </tr>
+        <tr>
+            <td id="cName">客户</td>
+            <td class="tf"><{$sc['name']}></td>
+        </tr>
+        <tr>
+            <td>添加时间</td>
+            <td class="tf">
+                <input type="text" style="width:150px;" name="time"  onclick="showdatebox(this,'')" value="<{$time|date='Y-m-d',###}>" />
+            </td>
+        </tr>
+        <tr>
+            <td>金额</td>
+            <td class="tf">
+                <input type="text" style="width:100px;" name="money" value="<{$money|showPrice}>" />
+                <span>付款可写成负数，如-100</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>备 注</td>
+            <td class="tf"><textarea name="comment" style="width:500px; height:80px;"><{$comment}></textarea></td>
+        </tr>
+    </table>
+    <input type="hidden" name="id" value="<{$id}>" />
+    <input type="submit" class="button" value="保 存" />
+</form>
+<script src="../Public/JS/datebox.js"></script>
+<script type="text/javascript">
+//new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'})
+
+$(document).ready(function(){
+    $("#cType").change(function(){
+        changeType();
+    });
+
+	$("#client").change(function(){
+    	$("#showlist option").remove();
+		var type = $(this).val();
+		var types = "__APP__/Client/index";
+
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+				}else{
+					alert("121");
+				}
+	   		},
+			'json'
+	   );
+    });
+
+    $("#supplier").change(function(){
+    	$("#showlist option").remove();
+		var type = $(this).val();
+		var types = "__APP__/Supplier/index";
+
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 var selected = '';
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+
+					 $("#showlist option[value='<{$cors}>']").attr("selected", 'selected');
+				}else{
+					alert("121");
+				}
+	   		},
+			'json'
+	   );
+    });
+
+});
+
+changeType();
+function changeType()
+{
+    var type = $(this).val();
+
+    if(type == 'supplier')
+    {
+        $("#client").hide();
+        $("#supplier").show();
+        $("#cName").html('供应商');
+    }else{
+        $("#supplier").hide();
+        $("#client").show();
+        $("#cName").html('客户');
+    }
+}
+
+function showBank()
+{
+    var way = $("#way").val();
+    if(way > 0){
+        $("#bank").show();
+    }else{
+        $("#bank").hide();
+    }
+}
+
+showBank();
+</script>
+<include file="Public:footer" />

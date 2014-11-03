@@ -1,0 +1,175 @@
+<include file="Public:header" />
+<h3><{$tname}>查看</h3>
+
+<form action="__URL__/audit" method="post">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">基本信息</th>
+        </tr>
+        <tr>
+            <td width="90">单 号</td>
+            <td class="tf"><{$num}></td>
+        </tr>
+
+        <tr>
+            <td>货 品</td>
+            <td class="tf">
+                <volist name="goods" id="vo">
+                <div style="padding:5px;">
+                    <{$allgoods[$vo['goods']]['name']}>(<{$allgoods[$vo['goods']]['model']}>)<br />
+                    <div class="tr" style="color:#999; padding:5px 0px; border-bottom:#CCC dashed 1px;">
+                        数 量：<{$vo['num']}><{$allgoods[$vo['goods']]['unit']}>
+                        备 注：<{$vo['com']|html}>
+
+                        <if condition="$audit gt 0">
+                            <iterate name="vo['stock']" id="voo">
+                                <div class="vBox" style="padding:10px 5px; background:#EEE;">
+                                    仓 库：<{$group[$voo['group']]['name']}>　　
+                                    数 量：<{$voo['num']}>
+                                    <?php foreach ($coststock[$vo['goods']][$voo['group']]['detail'] as $k => $v) {
+                                echo "<p>"."时间批次：".date('Y-m-d',$v['rtime'])." 数量：".$v['num']."个 成本单价：".showPrice($v['price'])."元</p>";
+                            }?>
+                                </div>
+                            </iterate>
+
+                        <else />
+                            <div class="vBox" style="padding:10px 5px; background:#EEE;">
+                                仓 库：
+                                <select name="out_group[<{$vo['goods']}>][]">
+                                    <volist name="group" id="go">
+                                    <option value="<{$go['gid']}>"><{$go['levelstr']}><{$go['name']}></option>
+                                    </volist>
+                                </select>&nbsp;
+                                数 量：<input type="text" style="width:50px;" name="out_num[<{$vo['goods']}>][]" />
+                            </div>
+                            <div class="tr" style="padding:5px;"><a href="javascript:vol();" onclick="addGroup(this)">+添加仓库分配</a></div>
+                        </if>
+                    </div>
+                </div>
+                </volist>
+            </td>
+        </tr>
+
+        <tr >
+        	<td >原材料</td>
+            <td class="tf">
+            <volist name="used" id="oo">
+            <div style="padding:10px 5px; line-height:22px; border-bottom:#666 dashed 1px; ">
+                <b style="font-size:14px;"><{$allgoods[$oo['goods']]['name']}>(<{$allgoods[$oo['goods']]['model']}>)</b><br />
+                　数 量：<{$oo['used']}> <{$allgoods[$oo['goods']]['unit']}><br />
+                　备 注：<{$vo['com']|html}>
+                <if condition="$audit gt 0">
+                    <iterate name="oo['stock']" id="ooo">
+                        <div class="vBox" style="padding:10px 5px; background:#EEE;">
+
+                            仓 库：<{$group[$ooo['group']]['name']}>&nbsp;&nbsp;&nbsp;&nbsp;
+                            数 量：<{$ooo['num']}>&nbsp;&nbsp;&nbsp;&nbsp;
+                            总计：<{$ooo['price']|showPrice}>元
+                        </div>
+                    </iterate>
+
+                <else />
+                    <div class="vBox" style="padding:10px 5px; background:#EEE;">
+                        仓 库：
+                        <select name="in_group[<{$oo['goods']}>][]">
+                            <volist name="group" id="go">
+                            <option value="<{$go['gid']}>"><{$go['levelstr']}><{$go['name']}></option>
+                            </volist>
+                        </select>&nbsp;
+                        数 量：<input type="text" style="width:50px;" name="in_num[<{$oo['goods']}>][]" />
+                    </div>
+                    <div class="tr" style="padding:5px;"><a href="javascript:vol();" onclick="addGroup(this)">+添加仓库分配</a></div>
+                </if>
+            </div>
+
+            </volist>
+            </td>
+        </tr>
+
+        <tr>
+            <td>备 注</td>
+            <td class="tf"><{$comment|text}></td>
+        </tr>
+    </table>
+
+    <div style="width:500px;">
+        <div class="f">
+            <input type="button" class="button" onclick="location.href='history.go(-1);'" value="返 回" />
+        </div>
+
+        <eq name="audit" value="0">
+            <present name="can_do[$mname]['audit']">
+            <div class="r">
+                <input type="hidden" name="id" value="<{$id}>">
+                <input type="submit" class="button" value="审核通过" />
+                <input type="button" class="button_red" onclick="location.href='__URL__/audit/refuse/<{$id}>'" value="审核拒绝" />
+            </div>
+            </present>
+        <else />
+            <lt name="audit" value="0">
+            <div class="r">
+                <input type="button" class="button_red" onclick="location.href='__URL__/edit/id/<{$id}>'" value="修 改" />
+            </div>
+            </lt>
+        </eq>
+    </div>
+</form>
+
+<script type="text/javascript">
+function addGroup(obj){
+    obj = $(obj).parent();
+    var clone = obj.prev("div").clone();
+    clone.children("input,select").val('');
+    obj.before(clone);
+}
+/*<eq name="abs" value="1">*/
+/*
+//入库数不超过订单
+$(".vBox input:text").keyup(function(){
+    var obj = $(this);
+    var sum = parseFloat(obj.parent().parent().children(".num").val());
+    var count = 0;
+    obj.parent().parent().find("input:text").each(function(i){
+        count += parseFloat($(this).val());
+    });
+    if(count > sum) {
+        alert("设定数量超过订单总数！");
+        obj.val(sum - (count - parseFloat($(this).val())));
+    }
+});
+*/
+
+/*<else />*/
+/*
+//出库数不超过库存
+$(".vBox input:text").keyup(function(){
+    var obj = $(this);
+    var group = $(this).prevAll("select:eq(0)").val();
+    var goods = parseInt(obj.parent().parent().children(".goods").val());
+    ajax("__APP__/Stock/getsum/", {group:group,goods:goods}, 'get', function(data){
+        if(data.status == 1){
+            if(parseFloat(data.data) < parseFloat(obj.val()) ){
+                alert("设定数量超过库存数目！");
+                obj.val(parseFloat(data.data));
+                return;
+            }
+        }else{
+            alert("读取仓库库存数据错误！");
+        }
+    });
+    var sum = parseFloat(obj.parent().parent().children(".num").val());
+    var count = 0;
+    obj.parent().parent().find("input:text").each(function(i){
+        count += parseFloat($(this).val());
+    });
+    if(count > sum) {
+        alert("设定数量超过订单总数！");
+        obj.val(sum - (count - parseFloat($(this).val())));
+        return;
+    }
+});
+*/
+/*</eq>*/
+
+</script>
+<include file="Public:footer" />

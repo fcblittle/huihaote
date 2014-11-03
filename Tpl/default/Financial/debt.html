@@ -1,0 +1,52 @@
+<include file="Public:header" />
+<h3>应收应付 统计</h3>
+
+<script src="../Public/JS/datebox.js"></script>
+<div>
+<form method="GET" action="__ACTION__">
+类型：
+<select style="margin-bottom:10px;" id="cType" name="type">
+    <option value="supplier" <eq name="type" value="supplier">selected="selected"</eq> >供应商</option>
+    <option value="client" <eq name="type" value="client">selected="selected"</eq> >客户</option>
+</select>　　
+公司名：
+<input type="text" name="name" value="<{$name}>" />
+时间：
+时 间：<input name="start" id="start" style="width:100px;" type="input" value="<if condition='$start'><{$start|date='Y-m-d',###}></if>" onclick="showdatebox(this,'')"  />
+至 <input name="end" id="end" style="width:100px;" type="input" value="<if condition='$end'><{$end|date='Y-m-d',###}></if>" onclick="showdatebox(this,'')" />
+<input type="submit" name='ac' value="搜 索" />
+<input type="submit" name='ac' value="导 出" />
+<input type="submit" name='ac' value="打 印" />
+</form>
+</div>
+<table cellpadding="2" cellspacing="1" border="0" class="needhover" style="width:780px;">
+    <tr>
+        <th width="300">公司名</th>
+        <th width="180">累计应收款</th>
+        <th width="180">累计应付款</th>
+        <th width="120">操作</th>
+    </tr>
+    <volist name="list" id="vo">
+        <tr>
+            <td><{$vo['name']}></td>
+            <td><{$vo['income']|showPrice}></td>
+            <td><{$vo['pay']|showPrice}></td>
+            <td>
+                <a href="__URL__/debtList/id/<{$vo['id']}>/type/<{$type}>">查看明细</a>
+            </td>
+        </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="2">总计应收款：<{$total['income']|showPrice}>　　总计应付款：<{$total['pay']|showPrice}></td>
+        <td colspan="2" class="tr"><{$page}></td>
+    </tr>
+</table>
+
+<present name="can_do['Financial']['addDebt']"><input type="button" class="button" onclick="location.href='__URL__/addDebt'" value="添 加" /> &nbsp;</present>
+
+<script type="text/javascript">
+function openSearch(){
+    $("#Search").show();
+}
+</script>
+<include file="Public:footer" />

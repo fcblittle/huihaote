@@ -1,0 +1,182 @@
+<include file="Public:header" />
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+<h3><{$tname}> 统计列表</h3>
+
+<form id="Search" action="__URL__/statistics" method="get" style="background:#FFF; padding:10px; margin-top:20px; width:100%;">
+    姓 名：
+    <select id="search" name="search">
+        <option value="0">全部</option>
+        <iterate name="allUsers" id="vo">
+            <option value="<{$vo['uid']}>" <eq name="search" value="$vo['uid']">selected="selected"</eq>><{$vo['name']}></option>
+        </iterate>
+    </select>　
+    税率
+    <select name="tax" id="tax">
+        <option value="-1">全部</option>
+        <option value="0.00"<eq name="tax" value="0.00">selected="selected"</eq>>0.00%</option>
+        <option value="17.00"<eq name="tax" value="17.00">selected="selected"</eq>>17.00%</option>
+    </select>　
+    客 户：
+    <select  id="cors" style="width:180px;">
+        <volist name="DB_type" id="vo">
+        <option value="<{$vo['id']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+        </volist>
+    </select>
+    <select id="showlist" name="cors" style="width:300px;">
+        <option value="">请选择...</option>
+        <volist name="cors" id ="to">
+        	<option value="<{$to['id']}>" <eq name="_cors" value="$to['id']">selected="selected"</eq>><{$to['name']}></option>
+        </volist>
+    </select>
+    时 间：<input name="start" id="start" style="width:100px;" type="input" value="<{$start}>" onclick="showdatebox(this,'')" readonly="readonly" />
+    至 <input name="end" id="end" style="width:100px;" type="input" value="<{$end}>" onclick="showdatebox(this,'')" readonly="readonly" />
+    <input class="button" type="submit" name="ac" value="搜 索" />
+    <input class="button" type="submit" name="ac" value="打 印" />
+    <input class="button" type="submit" name="ac" value="导 出" />
+</form>
+
+<table cellpadding="2" cellspacing="1" border="0" class="needhover">
+    <tr>
+        <th>单 号</th>
+        <th><eq name="abs" value="1">供应商<else />客 户</eq></th>
+        <th>销售人员</th>
+        <th width="100">总价</th>
+        <th width="60">税率</th>
+        <th width="60">销售成本</th>
+        <th width="100">提成</th>
+        <th width="120">申请时间</th>
+        <th width="80">状 态</th>
+        <th width="170">操 作</th>
+    </tr>
+
+    <volist name="list" id="vo">
+        <tr>
+            <td><{$vo.num}></td>
+            <td><{$vo['cors']['name']}></td>
+            <td><{$allUsers[$vo['sale']]['name']}></td>
+            <td><{$vo['total']+$vo['tax_total']|showPrice}></td>
+            <td><{$vo['tax']}>%</td>
+            <td><{$vo['cost']|showPrice}></td>
+            <td><{$vo['income']|showPrice}></td>
+            <td><{$vo.time|date='Y-m-d　H:i',###}></td>
+            <td>
+                <eq name="vo['over']" value="0">
+                    <span style="color:red">未结</span>
+                <else />
+                    <span style="color:#CCC">完结</span>
+                </eq>
+            </td>
+            <td>
+                <present name="can_do[$mname]['view']">&nbsp;┊&nbsp;<a href="__URL__/view/id/<{$vo.id}>">查 看</a></present>
+                <present name="can_do[$mname]['costView']">&nbsp;┊&nbsp;<a href="__URL__/costView/id/<{$vo.id}>">成本查看</a></present>
+                <!--<present name="can_do[$mname]['edit']">&nbsp;┊&nbsp;<a href="__URL__/edit/id/<{$vo.id}>">修 改</a></present>
+                <present name="can_do[$mname]['delete']">&nbsp;┊&nbsp;<a href="__URL__/delete/id/<{$vo.id}>">删 除</a></present>-->
+                &nbsp;┊&nbsp;
+            </td>
+        </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="5" style="text-align: left;">
+            总金额：<{$total+$taxTotal|showPrice}>　
+            含税销售：<{$taxTotal+$haveTax-$taxreback|showPrice}>　
+            退货：<{$reback|showPrice}>　
+            提成：<{$income|showPrice}><br />
+            差额：<?php if(($total+$taxTotal-$reback) < 0) echo "-";?><{$total+$taxTotal-$reback|showPrice}>　
+        </td>
+        <td colspan="5" class="tr"><{$page}></td>
+    </tr>
+</table>
+
+<!--
+<present name="can_do[$mname]['add']"><input type="button" class="button" onclick="location.href='__URL__/add/do/1'" value="添 加" /> &nbsp;</present>
+-->
+<!--
+<present name="can_do[$mname]['printStatistics']"><input type="button" class="button" onclick="printStatistics();" value="打 印" /> &nbsp;</present>
+-->
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#cors").change(function(){
+		 $("#showlist option").remove();
+		var type = $(this).val();
+		if("<{$types}>" ==1)
+			var types = "__APP__/Supplier/index";
+			else
+				var types = "__APP__/Client/index";
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+				}else{
+					alert("121");
+				}
+	   		},
+			'json'
+	   );
+
+
+	   var corsv = $("#showlist option:selected").attr("title");
+	   $("#cors option[value='"+corsv+"']").attr("selected", true);
+
+    });
+
+});
+
+
+function printStatistics()
+{
+    var search = $("#search").val();
+    search = search ? '/search/'+search : '';
+
+    var start = $("#start").val();
+    start = start ? '/start/'+start : '';
+
+    var end = $("#end").val();
+    end = end ? '/end/'+end : '';
+
+    var cors = $("#showlist").val();
+    cors = cors ? '/cors/'+cors : '';
+
+    location.href= '__URL__/printStatistics' + search + start + end + cors;
+}
+
+function openSearch(){
+    $("#Search").show();
+}
+$(document).ready(function(){
+	$("#searchselect").change(function(){
+		$("#showlist option").remove();
+		var type = $(this).val();
+		if("<{$types}>" ==1)
+			var types = "__APP__/Supplier/index";
+			else
+			var types = "__APP__/Client/index";
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+				}else{
+					alert("121");
+				}
+	   		},
+			'json'
+	   );
+
+    });
+});
+</script>
+<include file="Public:footer" />

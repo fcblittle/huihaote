@@ -1,0 +1,95 @@
+<include file="Public:header" />
+<h3><if condition="$from">低值易耗品<else />固定资产</if>添加</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/add" method="post">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+        <tr>
+            <th colspan="2">基本数据</th>
+        </tr>
+        <tr>
+            <td>标 题</td>
+            <td class="tf"><input type="text" style="width:250px;" name="title" /></td>
+        </tr>
+        <tr>
+            <td>类 型</td>
+            <td class="tf">
+                <select name="type">
+                    <option value="exist">原有</option>
+                    <option value="buy">购买</option>
+                    <option value="sell">变卖</option>
+                    <!--ption value="old">折旧</option-->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>数　量</td>
+            <td class="tf"><input type="text" style="width:60px;" name="num" /></td>
+        </tr>
+        <tr>
+            <td>单　价</td>
+            <td class="tf"><input type="text" style="width:80px;" name="money" /></td>
+        </tr>
+        <tr>
+            <td>金　额</td>
+            <td class="tf"><input type="text" style="width:150px;" name="price" /></td>
+        </tr>
+        <tr>
+            <td>折旧金额</td>
+            <td class="tf"><input type="text" style="width:150px;" name="old" /></td>
+        </tr>
+        <tr>
+            <td>方 式</td>
+            <td class="tf">
+                <select id="way" name="way" onchange="showBank()">
+                    <option value="0">现金</option>
+                    <option value="1">银行</option>
+                </select>
+            </td>
+        </tr>
+        <tr id="bank" style="display:none;">
+            <td>银 行</td>
+            <td class="tf">
+                <select name="bank">
+                    <option value="0">-请选择-</option>
+                    <iterate name="banks" id="vo">
+                        <option value="<{$vo['id']}>"><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>经办人<em>*</em></td>
+            <td class="tf"><input type="text" style="width:150px;" name="user" /></td>
+        </tr>
+        <tr>
+            <td>日 期<em>*</em></td>
+            <td class="tf"><input type="text" style="width:150px;" name="time" readonly="readonly" onclick="showdatebox(this,'')" /></td>
+        </tr>
+        <tr>
+            <td>说 明</td>
+            <td class="tf"><textarea name="comment" style="width:350px; height:100px;"></textarea><br /></td>
+        </tr>
+    </table>
+    <input type="hidden" name="from" value="<{$from}>" />
+    <input type="hidden" name="low" value="<{$from}>" />
+    <input type="submit" class="button" value="保 存" />
+    <input type="button" class="button" onclick="location.href='__URL__/index'" value="返 回" />
+</form>
+
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'})
+
+function showBank()
+{
+    var way = $("#way").val();
+    if(way > 0){
+        $("#bank").show();
+    }else{
+        $("#bank").hide();
+    }
+}
+
+showBank();
+</script>
+<include file="Public:footer" />

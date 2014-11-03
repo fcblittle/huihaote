@@ -1,0 +1,142 @@
+<include file="Public:header" />
+<h3><{$tname}>添加</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/addDaily" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:600px;">
+        <tr>
+            <th colspan="2">基本数据</th>
+        </tr>
+        <tr>
+            <td>单 号</td>
+            <td class="tf"><input type="text" style="width:250px;" name="num" value="<{$num}>" /></td>
+        </tr>
+        <tr>
+            <td>日 期</td>
+            <td class="tf">
+                <input value="<?php echo date('Y-m-d'); ?>" type="text" style="width:150px;" name="time" readonly="readonly" onclick="showdatebox(this,'')" />
+            </td>
+        </tr>
+
+        <!--
+        <tr>
+            <td>方 式</td>
+            <td class="tf">
+                <select id="way" name="way" onchange="showBank()">
+                    <option value="0">现金</option>
+                    <option value="1">银行</option>
+                </select>
+            </td>
+        </tr>
+        <tr id="bank" style="display:none;">
+            <td>银 行</td>
+            <td class="tf">
+                <select name="bank">
+                    <option value="0">-请选择-</option>
+                    <iterate name="banks" id="vo">
+                        <option value="<{$vo['id']}>"><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+        -->
+        <tr>
+            <td>员工/经办人</td>
+            <td class="tf">
+                <select name="user">
+                    <iterate name="users" id="vo">
+                        <option value="<{$vo['uid']}>"><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td style="border-right:0px; text-align:left; line-height:30px;">
+                            科目:
+                            <select name="subject[]" style="width:250px;">
+                                <option value="0">-请选择-</option>
+                                <iterate name="subjects" id="vo">
+                                    <option value="<{$vo['id']}>" title="<{$vo['name']}>"><{$vo['name']}></option>
+                                </iterate>
+                            </select>　<br />
+                            收支:
+                            <select name="income[]" class="select-income" style="width:50px;">
+                                <option value="1">收入</option>
+                                <option value="2">支出</option>
+                            </select>　
+                            金额:<input type="text" style="width:60px;" class="_price" name="price[]" />　
+                            摘要:<input name="comment[]" style="width:170px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border:0px; text-align:left;"><a href="#" onclick="addOne(this)">再添加一个？</a></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>总额</td>
+            <td class="tf" id="totalPrice">0</td>
+        </tr>
+    </table>
+    <input type="hidden" name="type" value="<{$type}>" />
+    <input type="submit" class="button" name="ac" value="保 存" />
+    <input type="submit" class="button" name="ac" value="打 印" />
+    <input type="button" class="button" onclick="history.go(-1);" value="返 回" />
+</form>
+
+<script type="text/javascript">
+function floatAdd(arg1, arg2){  
+   var r1,r2,m;  
+   try{r1=arg1.toString().split(".")[1].length;}catch(e){r1=0;}  
+   try{r2=arg2.toString().split(".")[1].length;}catch(e){r2=0;}  
+   m=Math.pow(10,Math.max(r1,r2));
+   return (arg1*m+arg2*m)/m;
+  }
+    $(function(){
+        function sumPrice() {
+            var total = 0;
+            $("._price").each(function(i){
+                var _price = parseFloat($(this).val());
+                if ($(this).prev(".select-income").val() == 2) {
+                    _price = -_price;
+                }
+                if(_price)
+                    total = floatAdd(total, _price);
+            });
+
+            $("#totalPrice").html(total);
+        }
+        $(".select-income").live("change", function() {
+            sumPrice();
+        });
+        $("._price").live('keyup input propertychange', function(){
+            sumPrice();
+        });
+    });
+
+    function showBank()
+    {
+        var way = $("#way").val();
+        if(way > 0){
+            $("#bank").show();
+        }else{
+            $("#bank").hide();
+        }
+    }
+    showBank();
+
+    function addOne(obj)
+    {
+        var clone = $(obj).parent().parent().prev().clone();
+        $(obj).parent().parent().before(clone);
+        $(obj).parent().parent().prev().find('input').each(function(x){
+            $(this).val('');
+        });
+    }
+</script>
+<include file="Public:footer" />

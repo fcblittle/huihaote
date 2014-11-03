@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>打印</title>
+<style>
+	.limit{width:600px; margin-top:20px; color:#0070c0;}
+	.clear{ clear:both; height:0px; overflow:hidden; }
+	table {border-left:1px solid #333; border-top:1px solid #333;}
+	table td{border-right:1px solid #333; border-bottom:1px solid #333; line-height:25px; height:25px; font-size:12px; text-align:center;}
+</style>
+</head>
+
+<body class="limit">
+    <div style="margin-top:35px;">
+
+
+        <div id="header" style="width:100%; height:60px; line-height:30px; float:left; text-align:center;">
+            <span style="font-size:24px; font-weight:bold;"><{$t}>凭证<span>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+
+    <div style="height:20px; line-height:20px; width:100%; margin:5px; font-size:12px;">
+    	<div style="width:20%; float:left;">日期：<{$time|date='Y-m-d',###}></div>
+        <div style="width:20%; float:left;">经办人：<{$operator['name']}></div>
+    	<div style="width:30%; float:left; overflow:hidden;"><{$i}>科目：<{$s}></div>
+    	<div style="width:30%; float:right;">单据编号：<{$num}></div>
+    </div>
+    <table width="100%" cellpadding="0" cellspacing="0">
+    	<tr height="30">
+            <td>摘要</td>
+            <td width="200">科目</td>
+            <td width="100">金额</td>
+            <td width="60">记账</td>
+        </tr>
+        <?php foreach($price as $k=>$v){?>
+            <tr>
+                <td><{$comment[$k]}></td>
+                <td><{$subjects[$subject[$k]]['name']}></td>
+                <td><neq name="income[$k]" value="1">-</neq><?php echo sprintf('%0.2f', $v / 100) ?></td>
+                <td>&nbsp;</td>
+            </tr>
+        <?php } ?>
+        <tr>
+        	<td colspan="3" style="text-align:left; padding-left:10px;">
+            	金额大写(合计)： <{$cMoney}>　　
+                <span style="float:right; padding-right:20px;">小写合计：<if condition="$total < 0">-</if><{$total|showPrice}></span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+    <div style="height:20px; line-height:20px; width:100%; margin:5px; font-size:12px;">
+    	<div style="width:25%; float:left;">主管：</div>
+        <div style="width:25%; float:left;">审核：</div>
+    	<div style="width:25%; float:left;">出纳：</div>
+        <div style="width:25%; float:left;">制单：<?php echo Session::get('name'); ?></div>
+    </div>
+</div>
+</body>
+</html>

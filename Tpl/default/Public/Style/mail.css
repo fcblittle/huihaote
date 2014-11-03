@@ -1,0 +1,12 @@
+/* 个人信箱 */
+#content .mail{ font-size:14px; border-bottom:#CCC dashed 1px; padding:10px; cursor:pointer;}
+#content .mail .mailtitle p{float:left; margin-bottom:10px;}
+#content .mail .info{font-size:12px; color:#999; float:right;}
+#content .mail .info a{color:#999;}
+#content .mail .mailcontent{display:none; text-align:left; padding:10px; clear:both; color:#666; background:#EEE; cursor:default;}
+#content .mail .mailcontent .content{padding-bottom:10px;}
+#content .mail .mailcontent .reply{ width:80%; padding-left:50px; border-top:#CCC dashed 1px; font-size:12px;}
+#content .mail .mailcontent .reply dt{font-weight:bold; padding:5px 0px;}
+#content .mail .mailcontent .reply dd{ padding-bottom:10px; border-bottom:#CCC dashed 1px;}
+#content .mail .mailcontent .reply dt span{color:#3866A5}
+#content .mail .mailcontent .reply textarea{width:600px; height:80px; font-size:12px;}

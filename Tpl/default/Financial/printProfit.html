@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>打印</title>
+<style>
+	.limit{width:680px; margin-top:20px; color:#000; font-size:12px;}
+	.clear{ clear:both; height:0px; overflow:hidden; }
+	.table {border-left:1px solid #333; border-top:1px solid #333; width:100%;}
+	.table td{border-right:1px solid #333; border-bottom:1px solid #333; line-height:20px; height:20px; font-size:12px; text-align:center;}
+	#ixcore_run_time{ display:none;}
+	#ixcore_page_trace{ display:none;}
+</style>
+</head>
+
+<body class="limit">
+    <div style="margin-top:10px; font-size:12px;">
+        <img src="./logo.gif" width="50" style="vertical-align:middle;" />
+        <span>青岛惠好特自动化设备有限公司<span>
+    </div>
+
+    <h1 style="text-align:center; font-size:20px; margin:5px 0px;">利润统计明细</h1>
+
+    <div style="height:30px; line-height:30px; width:100%; margin:5px;">
+        <div style="width:100%; float:left;">
+            时间： <if condition="$stime"><{$stime}> 至 <{$etime}></if>
+        </div>
+    </div>
+
+    <table cellpadding="2" cellspacing="1" border="0" class="table">
+        <tr>
+            <td>销售总计</td>
+            <td colspan="2">
+                <?php if(($order['income']+$order['taxincome']-$swap['sale']) < 0){?>
+                    -<{$order['income']+$order['taxincome']-$swap['sale']|showPrice}>
+                <?php }else{ ?>
+                    <{$order['income']+$order['taxincome']-$swap['sale']|showPrice}>
+                <?php } ?>
+            </td>
+            <td>含税销售</td>
+            <td colspan="3">
+                <?php if(($order['incometaxtotal']+$order['taxincome']-$swap['taxsale']) < 0){?>
+                    -<{$order['incometaxtotal']+$order['taxincome']-$swap['taxsale']|showPrice}>
+                <?php }else{ ?>
+                    <{$order['incometaxtotal']+$order['taxincome']-$swap['taxsale']|showPrice}>
+                <?php } ?>
+            </td>
+            <td>应收账款</td>
+            <td colspan="3">
+                <?php if($debt['income'] < 0){?>
+                    -<{$debt['income']|showPrice}>
+                <?php }else{ ?>
+                    <{$debt['income']|showPrice}>
+                <?php } ?>
+            </td>
+        </tr>
+        <tr>
+            <td>维修总计</td>
+            <td colspan="2">
+                <?php if($serviceTotal < 0){?>
+                    -<{$serviceTotal|showPrice}>
+                <?php }else{ ?>
+                    <{$serviceTotal|showPrice}>
+                <?php } ?>
+            </td>
+            <td>含税维修</td>
+            <td colspan="3">
+                <?php if($taxService < 0){?>
+                    -<{$taxService|showPrice}>
+                <?php }else{ ?>
+                    <{$taxService|showPrice}>
+                <?php } ?>
+            </td>
+            <td>应收账款</td>
+            <td colspan="3">
+                <?php if($serviceDebt < 0){?>
+                    -<{$serviceDebt|showPrice}>
+                <?php }else{ ?>
+                    <{$serviceDebt|showPrice}>
+                <?php } ?>
+            </td>
+        </tr>
+        <tr>
+            <td>采购总计</td>
+            <td colspan="2">
+                <?php if(($order['pay']+$order['taxpay']-$swap['buy']) < 0){?>
+                    -<{$order['pay']+$order['taxpay']-$swap['buy']|showPrice}>
+                <?php }else{ ?>
+                    <{$order['pay']+$order['taxpay']-$swap['buy']|showPrice}>
+                <?php } ?>
+            </td>
+            <td>含税采购</td>
+            <td colspan="3">
+                <?php if(($order['paytaxtotal']+$order['taxpay']-$swap['taxbuy']) < 0){?>
+                    -<{$order['paytaxtotal']+$order['taxpay']-$swap['taxbuy']|showPrice}>
+                <?php }else{ ?>
+                    <{$order['paytaxtotal']+$order['taxpay']-$swap['taxbuy']|showPrice}>
+                <?php } ?>
+            </td>
+            <td>应付账款</td>
+            <td colspan="3">
+                <?php if($debt['pay'] < 0){?>
+                    -<{$debt['pay']|showPrice}>
+                <?php }else{ ?>
+                    <{$debt['pay']|showPrice}>
+                <?php } ?>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="15" height="10">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>经办人</td>
+            <td>销售金额</td>
+            <td>含税销售金额</td>
+            <td>维修金额</td>
+            <td>含税维修金额</td>
+            <td>应收金额</td>
+            <td>销售成本</td>
+            <td>维修成本</td>
+            <td>费用合计</td>
+            <td>毛利润</td>
+            <td>员工费用</td>
+        </tr>
+        <?php $dailyTotal = $workerTotal = $saleCost = $grossProfit = $serviceCost = 0; ?>
+    <volist name="users" id="vo">
+        <?php 
+            //过滤没有数据的人员
+            if(!($list[$vo['uid']]['total'] || $list[$vo['uid']]['return'] || $list[$vo['uid']]['service'] 
+        || $list[$vo['uid']]['tax_total'] || $list[$vo['uid']]['debt'] || $list[$vo['uid']]['debt_service']  || $list[$vo['uid']]['taxReturn'] || $list[$vo['uid']]['have_tax'] || $list[$vo['uid']]['cost_total'] || $list[$vo['uid']]['cost_return']
+        || $list[$vo['uid']]['cost'] || $list[$vo['uid']]['cost_service'] || $list[$vo['uid']]['daily']
+        || $list[$vo['uid']]['worker'])) continue; 
+        ?>
+
+        <tr>
+            <td><{$vo['name']}></td>
+            <td>
+                <?php if(($list[$vo['uid']]['total']-$list[$vo['uid']]['return']) < 0){?>
+                    -<{$list[$vo['uid']]['total']-$list[$vo['uid']]['return']|showPrice}>
+                <?php }else{ ?>
+                    <{$list[$vo['uid']]['total']-$list[$vo['uid']]['return']|showPrice}>
+                <?php } ?>
+               
+            </td>
+            <td>
+            <?php if(($list[$vo['uid']]['tax_total']+$list[$vo['uid']]['have_tax']-$list[$vo['uid']]['taxReturn']) < 0){?>
+                    -<{$list[$vo['uid']]['tax_total']+$list[$vo['uid']]['have_tax']-$list[$vo['uid']]['taxReturn']|showPrice}>
+                <?php }else{ ?>
+                    <{$list[$vo['uid']]['tax_total']+$list[$vo['uid']]['have_tax']-$list[$vo['uid']]['taxReturn']|showPrice}>
+                <?php } ?>
+            </td>
+            <td>
+                <?php if($list[$vo['uid']]['service'] < 0){?>
+                    -<{$list[$vo['uid']]['service']|showPrice}>
+                <?php }else{ ?>
+                    <{$list[$vo['uid']]['service']|showPrice}>
+                <?php } ?>
+            </td>
+            <td>
+                <?php if($list[$vo['uid']]['haveTaxService'] < 0){?>
+                    -<{$list[$vo['uid']]['haveTaxService']|showPrice}>
+                <?php }else{ ?>
+                    <{$list[$vo['uid']]['haveTaxService']|showPrice}>
+                <?php } ?>
+            </td>
+            <td>
+                <?php if(($list[$vo['uid']]['debt']+$list[$vo['uid']]['debt_service']) < 0){?>
+                    -<{$list[$vo['uid']]['debt']+$list[$vo['uid']]['debt_service']|showPrice}>
+                <?php }else{ ?>
+                    <{$list[$vo['uid']]['debt']+$list[$vo['uid']]['debt_service']|showPrice}>
+                <?php } ?>
+            </td>
+           
+
+            <td>
+                <?php if(($list[$vo['uid']]['cost_total']-$list[$vo['uid']]['cost_return']) < 0) {?>
+                    -<{$list[$vo['uid']]['cost_total']-$list[$vo['uid']]['cost_return']|showPrice}>
+                <?php }else{?>
+                    <{$list[$vo['uid']]['cost_total']-$list[$vo['uid']]['cost_return']|showPrice}>
+                <?php } ?>
+                <?php 
+                $saleCost += ($list[$vo['uid']]['cost_total']-$list[$vo['uid']]['cost_return']); ?>
+            </td>
+            <td>
+                <?php if(($list[$vo['uid']]['cost_service']) < 0){?>
+                    -<{$list[$vo['uid']]['cost_service']|showPrice}>
+                <?php }else{?>
+                    <{$list[$vo['uid']]['cost_service']|showPrice}>
+                <?php }?>
+                <?php 
+                $serviceCost += ($list[$vo['uid']]['cost_service']); ?>
+            </td>
+            <td>
+                <!--<lt name="list[$vo['uid']]['daily']" value="0">-</lt>
+                <{$list[$vo['uid']]['daily']|showPrice}> 
+                <?php $dailyTotal += $list[$vo['uid']]['daily']; ?>-->
+                <?php if($list[$vo['uid']]['daily'] < 0){?>
+                    -<{$list[$vo['uid']]['daily']|showPrice}>
+                <?php }else{ ?>
+                    <{$list[$vo['uid']]['daily']|showPrice}>
+                <?php } ?>
+            </td>
+            <td>
+                <?php 
+                    $profit = ($list[$vo['uid']]['total']+$list[$vo['uid']]['service']-$list[$vo['uid']]['return']) - ($list[$vo['uid']]['cost_total']-$list[$vo['uid']]['cost_return']+$list[$vo['uid']]['cost_service']) + $list[$vo['uid']]['daily'];
+                    //echo ($profit < 0 ? '-' : '') .showPrice($profit); 
+                    if($profit < 0){
+                ?>
+                    -<{$profit|showPrice}>
+                <?php 
+                    }else{
+                ?>
+                    <{$profit|showPrice}>
+                <?php
+                    }
+                    $grossProfit += $profit;
+                ?>
+            </td>
+            <td>
+                <!--<lt name="list[$vo['uid']]['worker']" value="0">-</lt>
+                <{$list[$vo['uid']]['worker']|showPrice}> 
+                <?php $workerTotal += $list[$vo['uid']]['worker']; ?>-->
+                <?php if($list[$vo['uid']]['worker'] < 0){?>
+                    -<{$list[$vo['uid']]['worker']|showPrice}>
+                <?php }else{ ?>
+                    <{$list[$vo['uid']]['worker']|showPrice}>
+                <?php } ?>
+            </td>
+        </tr>
+    </volist>
+    <tr>
+        <td>合计：</td>
+        <td>
+            <?php if(($order['income']+$order['taxincome']-$swap['sale']) < 0){?>
+                -<{$order['income']+$order['taxincome']-$swap['sale']|showPrice}>
+            <?php }else{ ?>
+                <{$order['income']+$order['taxincome']-$swap['sale']|showPrice}>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if(($order['incometaxtotal']+$order['taxincome']-$swap['taxsale']) < 0){?>
+                -<{$order['incometaxtotal']+$order['taxincome']-$swap['taxsale']|showPrice}>
+            <?php }else{ ?>
+                <{$order['incometaxtotal']+$order['taxincome']-$swap['taxsale']|showPrice}>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if($serviceTotal < 0){?>
+                -<{$serviceTotal|showPrice}>
+            <?php }else{ ?>
+                <{$serviceTotal|showPrice}>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if($taxService < 0){?>
+                -<{$taxService|showPrice}>
+            <?php }else{ ?>
+                <{$taxService|showPrice}>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if(($debt['income']+$serviceDebt) < 0){?>
+                -<{$debt['income']+$serviceDebt|showPrice}>
+            <?php }else{ ?>
+                <{$debt['income']+$serviceDebt|showPrice}>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if($saleCost < 0){?>
+                -<{$saleCost|showPrice}>
+            <?php }else{ ?>
+                <{$saleCost|showPrice}>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if($serviceCost < 0){?>
+                -<{$serviceCost|showPrice}>
+            <?php }else{ ?>
+                <{$serviceCost|showPrice}>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if($dailyTotal < 0){?>
+                -<{$dailyTotal|showPrice}>
+            <?php }else{ ?>
+                <{$dailyTotal|showPrice}>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if($grossProfit < 0){?>
+                -<{$grossProfit|showPrice}>
+            <?php }else{ ?>
+                <{$grossProfit|showPrice}>
+            <?php } ?>
+        </td>
+        <td>
+            <?php if($workerTotal < 0){?>
+                -<{$workerTotal|showPrice}>
+            <?php }else{ ?>
+                <{$workerTotal|showPrice}>
+            <?php } ?>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="15" height="10">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="15" style="text-align: left;">
+            利　　润：
+            销售总计
+            (
+                <?php if(($order['income']+$order['taxincome']-$swap['sale']) < 0){?>
+                    -<{$order['income']+$order['taxincome']-$swap['sale']|showPrice}>
+                <?php }else{ ?>
+                    <{$order['income']+$order['taxincome']-$swap['sale']|showPrice}>
+                <?php } ?>
+            ) + 
+            维修总计
+            (
+                <?php if($serviceTotal < 0){?>
+                    -<{$serviceTotal|showPrice}>
+                <?php }else{ ?>
+                    <{$serviceTotal|showPrice}>
+                <?php } ?>
+            ) - 
+            采购总计
+            (
+                <?php if(($order['pay']+$order['taxpay']-$swap['buy']) < 0){?>
+                    -<{$order['pay']+$order['taxpay']-$swap['buy']|showPrice}>
+                <?php }else{ ?>
+                    <{$order['pay']+$order['taxpay']-$swap['buy']|showPrice}>
+                <?php } ?>
+            ) - 
+            费用总计
+            (
+                <?php if($dailyTotal < 0){?>
+                    -<{$dailyTotal|showPrice}>
+                <?php }else{ ?>
+                    <{$dailyTotal|showPrice}>
+                <?php } ?>
+            ) - 
+            员工费用
+            (
+                <?php if($workerTotal < 0){?>
+                    -<{$workerTotal|showPrice}>
+                <?php }else{ ?>
+                    <{$workerTotal|showPrice}>
+                <?php } ?>
+            ) = 
+            <?php 
+                $total = ($order['income']+$order['taxincome']-$swap['sale']) + ($serviceTotal) - ($order['pay']+$order['taxpay']-$swap['buy']) - $dailyTotal - $workerTotal; 
+                if($total < 0){
+            ?>
+                -<{$total|showPrice}>
+            <?php }else{ ?>
+                <{$total|showPrice}>
+            <?php } ?>
+            <br />
+            仓库结余：
+            期初结余
+            (
+                <?php if($_stockRemain < 0){?>
+                    -<{$_stockRemain|showPrice}>
+                <?php }else{ ?>
+                    <{$_stockRemain|showPrice}>
+                <?php } ?>
+            ) + 
+            时间段内购买
+            (
+                <?php if(($order['pay']+$order['taxpay']-$swap['buy']) < 0){?>
+                    -<{$order['pay']+$order['taxpay']-$swap['buy']|showPrice}>
+                <?php }else{ ?>
+                    <{$order['pay']+$order['taxpay']-$swap['buy']|showPrice}>
+                <?php } ?>
+            ) - 
+            时间段内销售成本
+            (
+                <?php if($saleCost < 0){?>
+                    -<{$saleCost|showPrice}>
+                <?php }else{ ?>
+                    <{$saleCost|showPrice}>
+                <?php } ?>
+            ) - 
+            时间段内维修成本
+            (
+                <?php if($serviceCost < 0){?>
+                    -<{$serviceCost|showPrice}>
+                <?php }else{ ?>
+                    <{$serviceCost|showPrice}>
+                <?php } ?>
+            ) =  
+            <?php if(($stockRemain - $saleCost-$serviceCost) < 0){?>
+                -<{$stockRemain - $saleCost-$serviceCost|showPrice}>
+            <?php }else{ ?>
+                <{$stockRemain - $saleCost-$serviceCost|showPrice}>
+            <?php } ?>
+        </td>
+    </tr>
+    </table>
+
+</body>
+</html>

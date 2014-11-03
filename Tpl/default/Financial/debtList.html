@@ -1,0 +1,35 @@
+<include file="Public:header" />
+<h3>应收应付 明细</h3>
+<table cellpadding="2" cellspacing="1" border="0" class="needhover" style="width:780px;">
+    <tr>
+        <th width="200">应收款</th>
+        <th width="200">应付款</th>
+        <th width="280">说明</th>
+        <th width="100">操作</th>
+
+    </tr>
+    <volist name="list" id="vo">
+        <tr>
+            <td><gt name="vo['money']" value="0"><{$vo['money']|showPrice}></gt></td>
+            <td><lt name="vo['money']" value="0"><{$vo['money']|showPrice}></lt></td>
+            <td><{$vo['comment']}></td>
+            <td>
+                <a href="__APP__/Stock/edit/order/<{$vo['order']}>/come/<{$vo['come']}>/goods/<{$vo['goods']}>">查 看</a>
+                <if condition="$vo['hand']">
+                    <present name="can_do['Financial']['editDebt']"><a href="__URL__/editDebt/id/<{$vo.id}>">修 改</a></present>
+                </if>
+            </td>
+        </tr>
+    </volist>
+    <tr class="white page">
+        <td colspan="4" class="tr"><{$page}></td>
+    </tr>
+</table>
+
+<input type="button" onclick="history.go(-1)" value="返 回" />
+<script type="text/javascript">
+function openSearch(){
+    $("#Search").show();
+}
+</script>
+<include file="Public:footer" />

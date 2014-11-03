@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>打印</title>
+<style>
+	.limit{width:600px; margin-top:20px; color:#0070c0;}
+	.clear{ clear:both; height:0px; overflow:hidden; }
+	table {border-left:1px solid #333; border-top:1px solid #333;}
+	table td{border-right:1px solid #333; border-bottom:1px solid #333; line-height:25px; height:25px; font-size:12px; text-align:center;}
+</style>
+</head>
+
+<body class="limit">
+    <div style="margin-top:35px;">
+
+        <div id="header" style="width:100%; height:40px; line-height:30px; text-align:center; ">
+            <span style="font-size:24px; font-weight:bold;">
+                <?php if($order['type']==2){ ?>
+                    <eq name="financial['come']" value="return">收款<else />付款</eq>
+                <?php }else{ ?>
+                    <eq name="financial['come']" value="return">付款<else />收款</eq>
+                <?php } ?>
+                凭证
+            <span>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+
+    <div style="height:20px; line-height:20px; width:100%; margin:5px; font-size:12px;">
+    	<div style="width:26%; float:left;">日期：<{$financial['time']|date='Y-m-d',###}></div>
+    	<div style="width:36%; float:left;"><eq name="order['type']" value="2">贷方<else />借方</eq>科目：<{$s}></div>
+    	<div style="width:38%; float:right;">单据编号：<{$financial['num']}></div>
+    </div>
+    <table width="100%" cellpadding="0" cellspacing="0">
+    	<tr height="30">
+            <td>摘要</td>
+            <td width="200">科目</td>
+            <td width="100">金额</td>
+            <td width="60">记账</td>
+        </tr>
+        <?php foreach($order['goods'] as $k=>$v){?>
+            <tr>
+                <td><{$v['name']}></td>
+                <td>
+                    <div style="width:180px; overflow:hidden;">
+                    <select style="border:0px; width:200px; text-align:center; color:#0070c0;">
+                        <iterate name="subjects" id="vo">
+                            <option style="text-align:center; width:200px;"><{$vo['name']}></option>
+                        </iterate>
+                    </select>
+                    </div>
+                </td>
+                <td>
+                    <eq name="order['type']" value="1">
+                        <?php echo showPrice($v['total']+$v['rePrice']); ?>
+                    <else />
+                        <{$v['total']|showPrice}>
+                    </eq>
+                </td>
+                <td>&nbsp;</td>
+            </tr>
+        <?php } ?>
+        <tr>
+        	<td colspan="4" style="text-align:left; padding-left:10px;">
+            	金额大写(合计)： <{$cMoney}>　　
+                <span style="float:right; padding-right:20px;">小写合计：<{$total|showPrice}></span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+    <div style="height:20px; line-height:20px; width:100%; margin:5px; font-size:12px;">
+    	<div style="width:50%; float:left;">审核：<{$audit['name']}></div>
+        <div style="width:50%; float:left;">制单：<?php echo Session::get('name'); ?></div>
+    </div>
+</div>
+</body>
+</html>

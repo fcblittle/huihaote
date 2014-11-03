@@ -1,0 +1,16 @@
+/* Ê×Ò³ */
+#doTree{width:900px; height:500px; background:url('../Images/index_bg.png'); position:relative;}
+#doTree a{width:100px; height:110px; background-image:url('../Images/index.png'); display:block; text-decoration:none; position:absolute; color:#FFF;}
+#doTree a:hover{background-image:url('../Images/index_hover.png'); }
+#doTree #Supplier{background-position:-15px -130px; top:130px; left:15px;}
+#doTree #Morder{background-position:-150px -30px; top:30px; left:150px;}
+#doTree #Porder{background-position:-150px -220px; top:220px; left:150px;}
+#doTree #Stock_in{background-position:-290px -80px; top:80px; left:290px;}
+#doTree #Financial_out{background-position:-290px -335px; top:335px; left:290px;}
+#doTree #Stock{background-position:-440px -125px; top:125px; left:440px;}
+#doTree #Financial{background-position:-440px -245px; top:245px; left:440px;}
+#doTree #Stock_out{background-position:-610px -40px; top:40px; left:610px;}
+#doTree #Sorder{background-position:-610px -180px; top:180px; left:610px;}
+#doTree #Financial_in{background-position:-610px -335px; top:335px; left:610px;}
+#doTree #Client{background-position:-780px -200px; top:200px; left:780px;}
+#doTree a span{ background:url('../Images/index_num.gif') no-repeat; height:26px; width:86px; text-align:center; display:block; position:relative; top:-30px; left:40px; line-height:20px;}

@@ -1,0 +1,65 @@
+<include file="Public:header" />
+<h3>业务流程</h3>
+
+<link href="../Public/Style/index.css" rel="stylesheet" type="text/css" />
+<div style="width:100%; overflow:auto">
+    <div id="doTree">
+        <present name="can_do['Supplier']['index']">
+        <a id="Supplier" href="__APP__/Supplier/index" title="供货商列表">&nbsp;</a>
+        </present>
+
+        <present name="morder">
+        <a id="Morder" href="__APP__/Morder/audit" title="生产入库单审核">&nbsp;<span><{$morder}>件待审核</span></a>
+        <else />
+            <present name="can_do['Morder']['add']">
+            <a id="Morder" href="__APP__/Morder/add" title="添加生产入库单">&nbsp;</a>
+            </present>
+        </present>
+
+        <present name="porder">
+        <a id="Porder" href="__APP__/Porder/audit" title="采购入库单审核">&nbsp;<span><{$porder}>件待审核</span></a>
+        <else />
+            <present name="can_do['Porder']['add']">
+            <a id="Porder" href="__APP__/Porder/add" title="添加采购入库单">&nbsp;</a>
+            </present>
+        </present>
+
+        <present name="stock_in">
+        <a id="Stock_in" href="__APP__/Stock/index" title="入库审核">&nbsp;<neq name="stock_in" value="0"><span><{$stock_in}>件待审核</span></neq></a>
+        </present>
+
+        <present name="financial_out">
+        <a id="Financial_out" href="__APP__/Financial/index" title="支出审核">&nbsp;<neq name="financial_out" value="0"><span><{$financial_out}>件待审核</span></neq></a>
+        </present>
+
+        <present name="can_do['Stock']['index']">
+        <a id="Stock" href="__APP__/Stock/index" title="库存管理">&nbsp;</a>
+        </present>
+
+        <present name="can_do['Financial']['index']">
+        <a id="Financial" href="__APP__/Financial/index" title="财务管理">&nbsp;</a>
+        </present>
+
+        <present name="stock_out">
+        <a id="Stock_out" href="__APP__/Stock/index" title="出库审核">&nbsp;<neq name="stock_out" value="0"><span><{$stock_out}>件待审核</span></neq></a>
+        </present>
+
+        <present name="sorder">
+        <a id="Sorder" href="__APP__/Sorder/audit" title="销售出库单审核">&nbsp;<span><{$sorder}>件待审核</span></a>
+        <else />
+            <present name="can_do['Porder']['add']">
+            <a id="Sorder" href="__APP__/Sorder/add" title="添加销售出库单">&nbsp;</a>
+            </present>
+        </present>
+
+        <present name="financial_in">
+        <a id="Financial_in" href="__APP__/Financial/index" title="收入审核">&nbsp;<neq name="financial_in" value="0"><span><{$financial_in}>件待审核</span></neq></a>
+        </present>
+
+        <present name="can_do['Client']['index']">
+        <a id="Client" href="__APP__/Client/index" title="客户管理">&nbsp;</a>
+        </present>
+
+    </div>
+</div>
+<include file="Public:footer" />

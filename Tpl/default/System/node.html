@@ -1,0 +1,136 @@
+<include file="Public:header" />
+<div id="ajaxmsg"></div>
+<h3>系统节点<span>(该操作为高级系统设置，请注意使用)</span></h3>
+<form action="__URL__/node" method="post">
+    <table cellpadding="2" cellspacing="1" border="0" class="needhover" id="listbox">
+        <tr>
+            <th>节点名称</th>
+            <th width="200">Action路径</th>
+            <th width="100">菜单显示</th>
+            <th width="200">操 作</th>
+            <th width="100">排 序</th>
+        </tr>
+        <volist name="list" id="vo" key="vk">
+        <tr id="list_<{$vo['id']}>" class="parent">
+            <td colspan="3" class="tf bgblue" onclick="showChild(this);" title="点击打开"><b><{$vo['name']}></b></td>
+            <td class="bgblue"><a href="javascript:add(<{$vo['id']}>);">添加</a> ┊ <a href="javascript:edit(<{$vo['id']}>)">修改</a> ┊ <a href="javascript:del(<{$vo['id']}>)">删除</a></td>
+            <td class="bgblue"><input type="text" name="m_sort[<{$vo['id']}>]" style="width:20px; font-size:10px;" value="<{$vk}>" /></td>
+        </tr>
+        <sublist name="vo['child']" id="so" key="sk">
+        <tr id="list_<{$so['id']}>" class="child" style="display:none;">
+            <td><{$so['name']}></td>
+            <td><{$so['m']}>/<{$so['a']}><neq name="so['arg']">(<{$so['arg']}>)</neq></td>
+            <td><eq name="so['hide']" value="1">隐藏<else />显示</eq></td>
+            <td><a href="javascript:edit(<{$so['id']}>)">修改</a> ┊ <a href="javascript:del(<{$so['id']}>)">删除</a></td>
+            <td class="tr"><input type="text" name="a_sort[<{$vo['id']}>][<{$so['id']}>]" style="width:20px; font-size:10px;" value="<{$sk}>" /></td>
+        </tr>
+        </sublist>
+        </volist>
+    </table>
+    <input type="button" class="button" onclick="addline()" value="添 加" />
+    <input type="submit" class="button" value="保存排序" />
+</form>
+
+<script type="text/javascript">
+function showChild(obj){
+    $(obj).parent().nextUntil(".parent").toggle();
+}
+function addline(){
+    var content = '<label class="big">请输入节点类型名称：<br /><input id="name" type="text" style="width:220px;" value="" /></label>'+
+    '<label class="big">请输入节点MODULE：<br /><input id="module" type="text" style="width:220px;" value="" /></label>';
+    var fun = function(){
+        var name = $("#window #name").val();
+        var module = $("#window #module").val();
+        var sort = $("#listbox .parent").length+1;
+        ajax('__URL__/node',{type:'add', module:module, name:name},'post',function(data){
+            if(data.status==1){
+                $("#listbox").append('<tr id="list_'+data.data.id+'"><td colspan="3" class="tf bgblue"><b>'+data.data.name+'</b></td><td class="bgblue"><a href="javascript:add('+data.data.id+');">添加</a> ┊ <a href="javascript:edit('+data.data.id+')">修改</a> ┊ <a href="javascript:del('+data.data.id+')">删除</a></td><td class="bgblue"><input type="text" name="m_sort['+data.data.id+']" style="width:20px; font-size:10px;" value="'+sort+'" /></td></tr>');
+                closeWin();
+            }else{
+                alert(data.info);
+            }
+        });
+    }
+    win('添加新的节点分类', content, fun);
+}
+function edit(id){
+    if($("#list_"+id).children().length <= 2){
+        var name = $("#list_"+id+" td:eq(0)").text();
+        var content = '<label class="big">请输入节点类型名称：<br /><input id="name" type="text" style="width:220px;" value="'+name+'" /></label>';
+    }else{
+        var name = $("#list_"+id+" td:eq(0)").text();
+        var hide = $("#list_"+id+" td:eq(2)").text() == '显示'?0:1;
+        if(hide){
+            var select1 = 'selected="selected"'; var select0 = '';
+        }else{
+            var select1 = ''; var select0 = 'selected="selected"';
+        }
+        var content = '<label class="big">请输入节点名称：<br /><input id="name" type="text" style="width:220px;" value="'+name+'" /></label>'+
+        '<label class="big">是否在菜单中显示：<select id="hide"><option '+select1+'value="1">隐藏</option><option '+select0+'value="0">显示</option></select></label>';
+    }
+    var fun = function(){
+        var hiden = $("#window #hide").val();
+        ajax('__URL__/node',{type:'edit', id:id, name:$("#window #name").val(), hide:hiden},'post',function(data){
+            if(data.status == 1){
+                $("#list_"+id+" td:eq(0)").text($("#window #name").val());
+                if($("#list_"+id+" td:eq(2)").html()) $("#list_"+id+" td:eq(2)").text(hiden==1?'隐藏':'显示');
+                closeWin();
+            }else{
+                alert(data.info);
+            }
+        });
+    }
+    win("修改节点", content, fun);
+};
+function add(id){
+    var content = '<label class="big">请输入节点名称：<br /><input id="name" type="text" style="width:220px;" value="" /></label>'+
+    '<label class="big">请输入节点ACTION：<br /><input id="action" type="text" style="width:220px;" value="" /></label>'+
+    '<label class="big">是否在菜单中显示：<select id="hide"><option value="1">隐藏</option><option selected="selected" value="0">显示</option></select></label>'; //参数这里应该抓取各个Module下的参数设置
+    var fun = function(){
+        var name = $("#window #name").val();
+        var action = $("#window #action").val();
+        var hide = $("#window #hide").val();
+        ajax('__URL__/node',{type:'add', action:action, parent:id, hide:hide, name:name},'post',function(data){
+            if(data.status==1){
+                var node = $("#list_"+id).nextUntil(".parent").last();
+                if(!node.attr("id")) node = $("#listbox tr").last();
+                var sort = node.prevUntil(".parent").length+2;
+                node.after('<tr id="list_'+data.data.id+'">'+
+                    '<td>'+data.data.name+'</td>'+
+                    '<td>'+data.data.m+'/'+data.data.a+'</td>'+
+                    '<td>'+(data.data.hide==1?'隐藏':'显示')+'</td>'+
+                    '<td><a href="javascript:edit('+data.data.id+')">修改</a> ┊ <a href="javascript:del('+data.data.id+')">删除</a></td>'+
+                    '<td class="tr"><input type="text" name="a_sort['+id+']['+data.data.id+']" style="width:20px; font-size:10px;" value="'+sort+'" /></td>'+
+                '</tr>');
+                closeWin();
+            }else{
+                alert(data.info);
+            }
+        });
+    }
+    win('添加新的节点', content, fun);
+}
+function del(id){
+    var name = $("#list_"+id+" td:eq(0)").text();
+    if(window.confirm("确认要删除'"+name+"'节点吗？"))
+    {
+        ajax('__URL__/node',{type:'del', id:id},'post',function(data){
+            if(data.status==1){
+                if($("#list_"+id).children().length > 2){
+                    $("#list_"+id).remove();
+                }else{
+                    var node = $("#list_"+id).nextAll("tr:has('.bgblue')").first().prev();
+                    if(!node.attr("id")) node = $("#listbox tr").last();
+                    var start = $("#list_"+id).prevAll().length;
+                    var last = node.prevAll().length - start;
+                    $("#list_"+id).nextAll(":lt("+last+")").remove();
+                    $("#list_"+id).remove();
+                }
+            }else{
+                alert(data.info);
+            }
+        });
+    }
+}
+</script>
+<include file="Public:footer" />

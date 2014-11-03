@@ -1,0 +1,83 @@
+<include file="Public:header" />
+<div id="ajaxmsg"></div>
+<h3>角色赋权</h3>
+<script type="text/javascript" src="../Public/JS/tree.js"></script>
+<script language=javascript>
+function unselectall(obj){
+    if(!$(obj).attr("checked")){
+        $(obj).parents("tr").prev("tr").find(":checkbox").attr("checked", false);
+    }
+}
+function CheckAll(obj, id){
+    var type = $(obj).attr("checked");
+    $("#box_"+id).find("input:checkbox").attr("checked", type);
+}
+</script>
+<table cellpadding="2" cellspacing="0" border="0">
+    <tr class="white">
+        <td style="vertical-align:top;">
+            <select id="treebox" multiple="multiple" style="width:250px; height:300px;">
+            <sublist name="role" id="vo">
+                <option value="<{$vo['id']}>"><{$vo['levelstr']}> <{$vo['name']}></option>
+            </sublist>
+            </select>
+        </td>
+        <td style="vertical-align:top;">
+            <form  name="myform" action="__URL__/node" method="post">
+            <input id="role" type="hidden" name="role" value="" />
+            <table cellpadding="2" cellspacing="0" border="0" style="font-size:14px;">
+                <volist name="node" id="no" key="k">
+                <tr>
+                    <th class="tf"><input type="hidden" name="node[<{$no['id']}>]" value="0" /><{$no['name']}><input type='checkbox' onclick='CheckAll(this,<{$k}>)' /></th>
+                </tr>
+                <tr id="box_<{$k}>">
+                    <td>
+                    <sublist name="no['child']" id="so">
+                        <label style="width:20%; padding-left:5%; float:left; text-align:left;">
+                            <input type="checkbox" onclick="unselectall(this)" name="node[<{$so['id']}>]" value="1" /> <{$so['name']}>
+                        </label>
+                    </sublist>
+                    </td>
+                </tr>
+                </volist>
+                <tr>
+
+                    <td class="tr">
+                        <input type="submit" class="button" value="保 存" />
+                        <input type="button" onclick="allchecked()" class="button" value="全 选" />
+                    </td>
+                </tr>
+            </table>
+            </form>
+        </td>
+    </tr>
+</table>
+<script type="text/javascript">
+function allchecked(){
+    $("form :checkbox").attr("checked", "checked");
+    $("form th input:hidden").val(1);
+}
+$("#treebox").change(function(){
+    if($(this).children(":selected").length > 1){
+        $(this).children(":selected").attr("selected", false);
+        alert('不能使用多选角色');
+        return;
+    }
+    var id = $(this).children(":selected").val();
+    ajax("__URL__/node", {id:id}, 'post', function(data){
+        if(data.status == 1){
+            $(":checkbox").removeAttr("checked");
+            $("th input:hidden").val(0);
+            $("#role").val(id);
+            for(x in data.data){
+                $(":checkbox[name='node["+data.data[x]['node']+"]']").attr("checked","checked");
+                $(":checkbox[name='node["+data.data[x]['node']+"]']").closest('tr').prev().find("input:hidden").val(1);
+            }
+        }else{
+            alert(data.info);
+        }
+    });
+});
+$("form :checkbox").click(function(){ if($(this).attr("checked")) $(this).closest('tr').prev().find("input:hidden").val(1); });
+</script>
+<include file="Public:footer" />

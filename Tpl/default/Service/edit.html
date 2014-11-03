@@ -1,0 +1,255 @@
+<include file="Public:header" />
+<h3><{$tname}>修改</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="<eq name='url' value='audit'>__URL__/audit/edit/<{$id}>/url/<{$url}><else />__URL__/edit/url/<{$url}></eq>" method="post">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
+        <tr>
+            <th colspan="2">填写信息</th>
+        </tr>
+        <tr>
+            <td width="90">单 号</td>
+            <td class="tf"><input type="text" style="width:250px;" name="num" value="<{$num}>" /></td>
+        </tr>
+        <tr>
+            <td width="90">发送时间</td>
+            <td class="tf"><input type="text" style="width:250px;" name="time" value="<{$time|date='Y-m-d H:i',###}>" /></td>
+        </tr>
+        <!--
+        <tr>
+            <td>负责人员</td>
+            <td class="tf">
+                <input type="text" style="width:250px;" name="responsible" value="<{$responsible|substr=###, 1, -1}>" />
+            </td>
+        </tr>
+        <tr>
+            <td>维修人员</td>
+            <td class="tf">
+                <input type="text" style="width:150px;" name="service" value="<{$service}>" />
+            </td>
+        </tr>
+        -->
+        <neq name="mname" value="Wastage">
+        <!--
+        <tr>
+            <td>已付/收款</td>
+            <td class="tf">
+                <input type="text" style="width:80px;" name="havemoney" value="<{$havemoney|showPrice}>" />
+            </td>
+        </tr>
+
+        <tr>
+            <td>方 式<em>*</em></td>
+            <td class="tf">
+                <select id="way" name="way" onchange="showBank()">
+                    <option value="0" <eq name="way" value="0">selected="selected"</eq>>现金</option>
+                    <option value="1" <eq name="way" value="1">selected="selected"</eq>>银行</option>
+                </select>
+            </td>
+        </tr>
+        <tr id="bank" style="display:none;">
+            <td>银 行</td>
+            <td class="tf">
+                <select name="bank">
+                    <option>-请选择-</option>
+                    <iterate name="banks" id="vo">
+                        <option value="<{$vo['id']}>" <eq name="bank" value="$vo['id']">selected</eq>><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+        -->
+        <tr>
+            <td><eq name="abs" value="1">供应商<else />客 户</eq></td>
+            <td class="tf">
+                <select id="cors">
+                    <volist name="_type" id="vo">
+                        <option value="<{$vo['id']}>"><{$vo['levelstr']}><{$vo['name']}></option>
+                    </volist>
+                </select>
+                <select name="cors" id="showlist">
+                    <option value="">请选择...</option>
+                   	<volist name="corss" id="cco">
+                    <eq name ="cco['id']" value="$cors">
+                        <option value="<{$cco['id']}>" title="<{$cco['type']}>" selected="selected"><{$cco['name']}></option>
+                    <else />
+                        <option value="<{$cco['id']}>"><{$cco['name']}></option>
+                    </eq>
+                    </volist>
+                </select>
+                <eq name="abs" value="1">
+                    <present name="can_do['Supplier']['add']"><a href="__APP__/Supplier/add/return/<{$mname}>">+添加供应商</a></present>
+                <else />
+                    <present name="can_do['Client']['add']"><a href="__APP__/Client/add/return/<{$mname}>">+添加客户</a></present>
+                </eq>
+            </td>
+        </tr>
+        <tr>
+            <td>货 品</td>
+            <td class="tf">
+                <volist name="goods" id="vo">
+                    <div style="padding:10px 5px; border-bottom:#666 dashed 1px;">
+                        货品类型：<select class="goods_type" style="width:150px;"></select>
+                        货品：<select name="goods[]" class="goods" id="<{$vo['goods']}>" style="width:300px;"></select>
+                        <br /><br />
+                        　　单 价：<input autocomplete='off' class="price" type="text" style="width:80px;" name="goods_price[]" onkeyup="<eq name='needprice' value='1'>sumPrice(this)</eq>" value="<{$vo['price']/100}>" /> 元
+                        　　数 量：<input autocomplete='off' type="text" class="num" style="width:50px;" name="goods_num[]" onkeyup="<eq name='needprice' value='1'>sumPrice(this)</eq>" value="<{$vo['num']}>" /> <span class="unit"><{$allgoods[$vo['goods']]['unit']}></span>
+                        <br /><br />
+                        　　税 率：<input autocomplete='off' class="tax" type="text" style="width:80px;" onkeyup="<eq name='needprice' value='1'>taxPrice(this)</eq>" name="tax[]" value="<{$vo['tax']}>" /> %
+                        　　税 额：<input autocomplete='off' type="text" class="tax_total" style="width:80px;" name="tax_total[]" value="<{$vo['tax_total']|showPrice}>" /> 元
+                        <br /><br />
+                        <eq name="needprice" value="1">　　总金额：<input autocomplete='off' type="text" class="all_total" style="width:80px;" name="total[]" value="<{$vo['total']+$vo['tax_total']|showPrice}>" /> 元</eq>
+                        　　备注：<input type="text" style="width:300px;" name="goods_com[]" value="<{$vo['com']}>" />　　
+                    </div>
+                </volist>
+                <div id="tempAdd" class="tr" style="padding:5px;"><a href="javascript:addGoods()">+添加货品</a></div>
+            </td>
+        </tr>
+        </neq>
+    </table>
+    <input type="hidden" name="id" value="<{$id}>" />
+    <input type="submit" class="button" value="保 存" />
+</form>
+<script type="text/javascript">
+new nicEditors.allTextAreas({buttonList : ['fontFormat','fontSize','bold','italic','underline','forecolor','image','upload'], uploadURI : '__APP__/Public/upload/'});
+function hidePrice(obj)
+{
+    var val = $(obj).val();
+    if(val == '保修内')
+        $(obj).next().hide();
+    else
+        $(obj).next().show();
+}
+function addGoods(){
+    var clone = $("#tempAdd").prev("div").html();
+    //clone.children("input,select").val('');
+    //clone.children(".unit").html('');
+    $("#tempAdd").before('<div style="padding:10px 5px; border-bottom:#666 dashed 1px;">'+clone+"</div>");
+}
+function addMaterial(){
+    var clone = $("#tempAdd2").prev("div").clone();
+    clone.children("input,select").val('');
+    clone.children(".unit").html('');
+    $("#tempAdd2").before(clone);
+}
+function sumPrice(obj){
+    //数量
+    var num = parseInt($(obj).parents().find(".num").val(), 10);
+    //含税价格
+    var price = $(obj).parents().find(".price").val();
+    if(!num || !price){
+        return '';
+    }
+
+    //总价
+    var total = Math.round(num * price * 100000000)/100000000;
+    $(obj).parent().find(".all_total").val(total);
+
+    //税率
+    var tax = parseFloat($(obj).parents().find(".tax").val(), 10);
+    if(tax>0)
+    {
+        //var tax_total = parseInt(Math.round(tax * total * 100)/100, 10)/100;
+        var tax_total = parseFloat(total*(1 - 1/(1+tax/100))).toFixed(2);
+        $(obj).parent().find(".tax_total").val(tax_total);
+    }
+}
+
+
+$(document).ready(function(){
+    ajax("__APP__/Goods/index", {type:1}, 'post', function(data){
+        if(data.status){
+            for(x in data.data.type){
+                var t = data.data.type[x];
+                $(".goods_type").append("<option value='"+t.id+"'>"+t.levelstr+t.name+"</option>");
+            }
+            $(".goods").append("<option value=''>请选择...</option>");
+            var status = '<{$abs}>';
+            for(x in data.data.list){
+                var t = data.data.list[x];
+                var p = status ? t.cost : t.price;
+                $(".goods").append("<option class='"+t.type+"' key='"+t.unit+"' title='"+(p/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+            }
+            $(".goods").each(function(){
+                var opt = $(this).find("option[value='"+$(this).attr("id")+"']");
+                opt.attr("selected", true);
+                var type = opt.attr("class");
+                $(this).find("option[class!='"+type+"']").remove();
+                $(this).prev(".goods_type").find("option[value='"+type+"']").attr("selected", true);
+            })
+        }else{
+            alert("查询失败，请重试！");
+        }
+    });
+
+    $(".goods_type").live('change', function(){
+        var obj = $(this);
+        ajax("__APP__/Goods/index/type/"+$(this).val(), {type:$(this).val()}, 'post', function(data){
+            if(data.status){
+                var status = '<{$abs}>';
+                obj.nextAll(".goods").html("");
+                obj.nextAll(".goods").append("<option key='' value=''>请选择...</option>");
+                for(x in data.data.list){
+                    var t = data.data.list[x];
+                    var p = status ? t.cost : t.price;
+                    obj.nextAll(".goods").append("<option key='"+t.unit+"' title='"+(p/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+                }
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+    $(".goods").change(function(){
+        $(this).siblings(".unit").html($(this).children("option:selected").attr("key"));
+        //$(this).siblings(".price").html("单价"+$(this).children("option:selected").attr("title"));
+        $(this).siblings(".goods_name").val($(this).children("option:selected").html());
+        sumPrice( $(this).siblings(".num").get() );
+    });
+
+	$("#cors").change(function(){
+		$("#showlist option").remove();
+		var type = $(this).val();
+		if("<{$types}>"==1)
+			types = "__APP__/Supplier/index";
+		else
+			types = "__APP__/Client/index";
+	 	ajax(types,
+			{type:type},
+			'get',
+			function(data){
+				if(data.status){
+					 if(false ==data.data) return;
+					 $("#showlist").append("<option key='' value=''>请选择...</option>");
+					 for(x in data.data){
+						 var d = data.data[x];
+						 $("#showlist").append("<option  value='"+d.id+"'>"+d.name+"</option>");
+					 };
+				}else{
+					alert("查询失败！");
+				}
+	   		},
+			'json'
+	   );
+
+    });
+
+	var corsv = $("#showlist option:selected").attr("title");
+	$("#cors option[value='"+corsv+"']").attr("selected", true);
+	var corsa = '<{$cors}>';
+	$("#showlist option[value='"+corsa+"']").attr("selected", true);
+});
+
+function showBank()
+{
+    var way = $("#way").val();
+    if(way > 0){
+        $("#bank").show();
+    }else{
+        $("#bank").hide();
+    }
+}
+
+showBank();
+</script>
+<include file="Public:footer" />

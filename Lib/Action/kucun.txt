@@ -1,0 +1,131 @@
+array(1) {
+  [0]=>
+  array(4) {
+    ["sale"]=>
+    string(6) "300000"
+    ["buy"]=>
+    string(1) "0"
+    ["taxsale"]=>
+    string(1) "0"
+    ["taxbuy"]=>
+    string(1) "0"
+  }
+}
+array(1) {
+  [0]=>
+  array(4) {
+    ["payTotal"]=>
+    string(8) "30507268"
+    ["taxPayTotal"]=>
+    string(6) "902282"
+    ["incomeTotal"]=>
+    string(11) "25963719.53"
+    ["taxIncomeTotal"]=>
+    string(7) "4643157"
+  }
+}
+array(1) {
+  [0]=>
+  array(2) {
+    ["payTotal"]=>
+    string(6) "389500"
+    ["incomeTotal"]=>
+    string(6) "557400"
+  }
+}
+array(1) {
+  [0]=>
+  array(1) {
+    ["serviceTotal"]=>
+    string(9) "338963.00"
+  }
+}
+
+5.29-5.29
+
+array(1) {
+  [0]=>
+  array(4) {
+    ["sale"]=>
+    string(6) "300000"
+    ["buy"]=>
+    string(6) "186000"
+    ["taxsale"]=>
+    string(1) "0"
+    ["taxbuy"]=>
+    string(1) "0"
+  }
+}
+array(1) {
+  [0]=>
+  array(4) {
+    ["payTotal"]=>
+    string(8) "30507268"
+    ["taxPayTotal"]=>
+    string(6) "902282"
+    ["incomeTotal"]=>
+    string(11) "25963719.53"
+    ["taxIncomeTotal"]=>
+    string(7) "4643157"
+  }
+}
+array(1) {
+  [0]=>
+  array(2) {
+    ["payTotal"]=>
+    string(6) "389500"
+    ["incomeTotal"]=>
+    string(6) "557400"
+  }
+}
+array(1) {
+  [0]=>
+  array(1) {
+    ["serviceTotal"]=>
+    string(9) "338963.00"
+  }
+}
+5.29-5.30
+array(1) {
+  [0]=>
+  array(4) {
+    ["sale"]=>
+    string(1) "0"
+    ["buy"]=>
+    string(6) "186000"
+    ["taxsale"]=>
+    string(1) "0"
+    ["taxbuy"]=>
+    string(1) "0"
+  }
+}
+array(1) {
+  [0]=>
+  array(4) {
+    ["payTotal"]=>
+    string(8) "30823935"
+    ["taxPayTotal"]=>
+    string(6) "934015"
+    ["incomeTotal"]=>
+    string(11) "26511519.53"
+    ["taxIncomeTotal"]=>
+    string(7) "4695465"
+  }
+}
+array(1) {
+  [0]=>
+  array(2) {
+    ["payTotal"]=>
+    string(6) "389500"
+    ["incomeTotal"]=>
+    string(6) "857400"
+  }
+}
+array(1) {
+  [0]=>
+  array(1) {
+    ["serviceTotal"]=>
+    string(9) "352263.00"
+  }
+}
+5.30

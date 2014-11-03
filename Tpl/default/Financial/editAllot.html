@@ -1,0 +1,99 @@
+<include file="Public:header" />
+<h3>银行调拨修改</h3>
+<script type="text/javascript" src="../Public/JS/datebox.js"></script>
+
+<form action="__URL__/editAllot" method="post" enctype="multipart/form-data">
+    <table cellpadding="2" cellspacing="1" border="0" style="width:600px;">
+        <tr>
+            <th colspan="2">基本数据</th>
+        </tr>
+        <tr>
+            <td>单 号</td>
+            <td class="tf"><input type="text" style="width:250px;" name="num" value="<{$num}>" /></td>
+        </tr>
+
+        <tr>
+            <td>调出银行</td>
+            <td class="tf">
+                <select name="from">
+                    <option value="-1" <eq name="from" value="-1">selected="selected"</eq>>库存现金</option>
+                    <iterate name="banks" id="vo">
+                        <option value="<{$vo['id']}>" <eq name="from" value="$vo['id']">selected="selected"</eq>><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>调入银行</td>
+            <td class="tf">
+                <select name="to">
+                    <option value="-1" <eq name="from" value="-1">selected="selected"</eq>>库存现金</option>
+                    <iterate name="banks" id="vo">
+                        <option value="<{$vo['id']}>" <eq name="to" value="$vo['id']">selected="selected"</eq>><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>调拨日期</td>
+            <td class="tf">
+                <input value="<{$time|date='Y-m-d', ###}>" type="text" style="width:150px;" name="time" readonly="readonly" onclick="showdatebox(this,'')" />
+            </td>
+        </tr>
+
+        <tr>
+            <td>调拨金额</td>
+            <td class="tf">
+                <input type="text" name="money" value="<{$money|showPrice}>" style="width:100px;" />  元
+            </td>
+        </tr>
+
+        <tr>
+            <td>经办人</td>
+            <td class="tf">
+                <select name="user">
+                    <option value="0">请选择</option>
+                    <iterate name="users" id="vo">
+                        <option value="<{$vo['uid']}>" <eq name="user" value="$vo['uid']">selected="selected"</eq>><{$vo['name']}></option>
+                    </iterate>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>简单描述</td>
+            <td class="tf">
+                <textarea name="describe" cols="50" rows="4"><{$describe}></textarea>
+            </td>
+        </tr>
+
+    </table>
+    <input type="hidden" name="id" value="<{$id}>" />
+    <input type="submit" class="button" name="ac" value="保 存" />
+    <input type="button" class="button" onclick="history.go(-1);" value="返 回" />
+</form>
+
+<script type="text/javascript">
+    function showBank()
+    {
+        var way = $("#way").val();
+        if(way > 0){
+            $("#bank").show();
+        }else{
+            $("#bank").hide();
+        }
+    }
+    showBank();
+
+    function addOne(obj)
+    {
+        var clone = $(obj).parent().parent().prev().clone();
+        $(obj).parent().parent().before(clone);
+        $(obj).parent().parent().prev().find('input').each(function(x){
+            $(this).val('');
+        });
+    }
+</script>
+<include file="Public:footer" />
