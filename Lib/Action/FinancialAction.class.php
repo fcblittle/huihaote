@@ -226,7 +226,7 @@ class FinancialAction extends Action
             $this -> display('printProfit');
         }else{
 
-            $this -> display('report');
+            $this -> display('profit');
         }
            
     }
