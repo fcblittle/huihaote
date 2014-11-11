@@ -74,10 +74,10 @@
 <span style="color:#CCC">完结</span><?php endif; ?>
 </td>
 <td>
-<?php if(isset($can_do[$mname]['view'])): ?>&nbsp;┊&nbsp;<a href="/index.php/Morder/view/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>">查 看</a><?php endif; ?>
-<?php if(isset($can_do[$mname]['edit'])): ?>&nbsp;┊&nbsp;<a href="/index.php/Morder/edit/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/p/<?php echo ($p); ?>">修 改</a><?php endif; ?>
-<?php if(isset($can_do[$mname]['delete'])): ?>&nbsp;┊&nbsp;<a href="/index.php/Morder/delete/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>">删 除</a><?php endif; ?>
-<?php if(isset($can_do[$mname]['costView'])): ?>&nbsp;┊&nbsp;<a href="/index.php/Morder/costView/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>">成本查看</a><?php endif; ?>
+<?php if(isset($can_do[$mname]['view'])): ?>&nbsp;┊&nbsp;<a href="/index.php/Sorder/view/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>">查 看</a><?php endif; ?>
+<?php if(isset($can_do[$mname]['edit'])): ?>&nbsp;┊&nbsp;<a href="/index.php/Sorder/edit/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/p/<?php echo ($p); ?>">修 改</a><?php endif; ?>
+<?php if(isset($can_do[$mname]['delete'])): ?>&nbsp;┊&nbsp;<a href="/index.php/Sorder/delete/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>">删 除</a><?php endif; ?>
+<?php if(isset($can_do[$mname]['costView'])): ?>&nbsp;┊&nbsp;<a href="/index.php/Sorder/costView/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>">成本查看</a><?php endif; ?>
 &nbsp;┊&nbsp;
 </td>
 </tr><?php endforeach; ?><?php endif; ?><?php else: echo "" ;?><?php endif; ?>
@@ -85,12 +85,12 @@
 <td colspan="7" class="tr"><?php echo ($page); ?></td>
 </tr>
 </table>
-<?php if(isset($can_do[$mname]['add'])): ?><input type="button" class="button" onclick="location.href='/index.php/Morder/add/do/1'" value="添 加" /> &nbsp;<?php endif; ?>
+<?php if(isset($can_do[$mname]['add'])): ?><input type="button" class="button" onclick="location.href='/index.php/Sorder/add/do/1'" value="添 加" /> &nbsp;<?php endif; ?>
 <?php if(!isset($search)): ?><input class="button" type="button" onclick="openSearch()" value="搜 索" />
 <?php else: ?>
-<input class="button" onclick="location.href='/index.php/Morder/<?php if(isset($url)): ?><?php echo ($url); ?><?php else: ?>index<?php endif; ?>'" type="button" value="返 回" /><?php endif; ?>
+<input class="button" onclick="location.href='/index.php/Sorder/<?php if(isset($url)): ?><?php echo ($url); ?><?php else: ?>index<?php endif; ?>'" type="button" value="返 回" /><?php endif; ?>
 
-<form id="Search" action="/index.php/Morder/index" method="get" style="border:#CCC solid 1px; background:#FFF; padding:10px; margin-top:20px; width:300px; display:none;">
+<form id="Search" action="/index.php/Sorder/index" method="get" style="border:#CCC solid 1px; background:#FFF; padding:10px; margin-top:20px; width:300px; display:none;">
 <label style="display:block; height:30px;">单　号：<input name="num" style="width:200px;" type="input" /></label>
 <?php if(($abs)  ==  "1"): ?>供应商<?php else: ?>客　户<?php endif; ?>：
 <select id="searchselect">
