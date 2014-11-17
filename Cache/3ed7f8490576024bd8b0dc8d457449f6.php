@@ -51,7 +51,7 @@
 <div id="table">
 <h3><?php echo ($tname); ?>查看</h3>
 
-<form action="/index.php/Sorder/audit" method="post">
+<form action="/index.php/Porder/audit" method="post">
 <table cellpadding="2" cellspacing="1" border="0" style="width:700px;">
 <tr>
 <th colspan="2">基本信息</th>
@@ -262,13 +262,13 @@
 <?php if(($audit)  ==  "0"): ?><?php if(isset($can_do[$mname]['audit'])): ?><div class="r">
 <input type="hidden" name="id" value="<?php echo ($id); ?>">
 <input type="submit" class="button" value="审核通过" />
-<input type="button" class="button_red" onclick="location.href='/index.php/Sorder/audit/refuse/<?php echo ($id); ?>'" value="审核拒绝" />
+<input type="button" class="button_red" onclick="location.href='/index.php/Porder/audit/refuse/<?php echo ($id); ?>'" value="审核拒绝" />
 </div><?php endif; ?>
 <?php else: ?>
 
 <div class="r">
-<?php if($audit > 0): ?><?php if(isset($can_do[$mname]['printOrder'])): ?><input type="button" class="button" onclick="location.href='/index.php/Sorder/printOrder/id/<?php echo ($id); ?>'" value="打 印" />　<?php endif; ?><?php endif; ?>
-<?php if($audit < 0): ?><input type="button" class="button_red" onclick="location.href='/index.php/Sorder/edit/id/<?php echo ($id); ?>'" value="修 改" /><?php endif; ?>
+<?php if($audit > 0): ?><?php if(isset($can_do[$mname]['printOrder'])): ?><input type="button" class="button" onclick="location.href='/index.php/Porder/printOrder/id/<?php echo ($id); ?>'" value="打 印" />　<?php endif; ?><?php endif; ?>
+<?php if($audit < 0): ?><input type="button" class="button_red" onclick="location.href='/index.php/Porder/edit/id/<?php echo ($id); ?>'" value="修 改" /><?php endif; ?>
 </div><?php endif; ?>
 </div>
 <?php if(C("TOKEN_ON")):?><input type="hidden" name="<?php echo C("TOKEN_NAME");?>" value="<?php echo Session::get(C("TOKEN_NAME")); ?>"/><?php endif;?></form>
