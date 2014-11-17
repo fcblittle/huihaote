@@ -400,9 +400,9 @@ if($total < 0){
 时间段内购买
 (
 <?php if(($order['pay']+$order['taxpay']-$swap['buy']) < 0){?>
-<span style="color:red;">-<?php echo (showPrice($order['pay']+$order['taxpay']-$swap['buy'])); ?></span>
+<span style="color:red;">-<?php echo (showPrice($order['pay']+$order['taxpay']-$swap['buy']+$swap['sale'])); ?></span>
 <?php }else{ ?>
-<span style="color:green;"><?php echo (showPrice($order['pay']+$order['taxpay']-$swap['buy'])); ?></span>
+<span style="color:green;"><?php echo (showPrice($order['pay']+$order['taxpay']-$swap['buy']+$swap['sale'])); ?></span>
 <?php } ?>
 ) - 
 时间段内销售成本

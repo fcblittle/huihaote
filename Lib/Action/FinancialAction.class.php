@@ -15,6 +15,160 @@ class FinancialAction extends Action
         include_once(LIB_PATH.'_initialize.php');
     }
 
+
+    private function calBalance($stime = 0)
+    {
+        $balance = 127827.74 * 100;
+
+        // 仓库结余=期初结余  + 时间段内购买  - 时间段内销售成本  - 时间段内维修成本
+
+        $condition = '1';
+        $condition .= ' AND `time` < '.$stime;
+
+        $prefix = C("DB_PREFIX");
+        //销售/采购统计
+        $sql = "SELECT
+                        SUM(CASE WHEN type=3 THEN total ELSE 0 END) as income,
+                        SUM(CASE WHEN type=3 THEN tax_total ELSE 0 END) as taxincome,
+                        SUM(CASE WHEN type=3 AND tax>0 THEN total ELSE 0 END) as incometaxtotal,
+                        SUM(CASE WHEN type=2 THEN total ELSE 0 END) as pay,
+                        SUM(CASE WHEN type=2 THEN tax_total ELSE 0 END) as taxpay,
+                        SUM(CASE WHEN type=2 AND tax>0 THEN total ELSE 0 END) as paytaxtotal
+                    FROM {$prefix}order
+                    WHERE {$condition} AND `audit`>0"; //AND `over`=1
+        //SUM(CASE WHEN type=3 AND tax>0 THEN total ELSE 0 END) as incometaxtotal,
+        //SUM(CASE WHEN type=2 AND tax>0 THEN total ELSE 0 END) as paytaxtotal,
+        //type=3为收入也就是卖出的产品，type=2为支出也就是买入的产品
+        //echo $condition;
+        $order = D() -> query($sql);
+
+        //统计每个人的销售
+        $_list = D("Order") -> field("id, uid, type, total, tax_total, cost, sale, tax") -> where($condition .' AND `type`=3 AND `audit`>0') -> order("`id` desc") -> findAll();
+
+        $list = $orderIds = array();
+
+        foreach ($_list as $v)
+        {
+            if(!isset($list[$v['sale']]['total']))
+                $list[$v['sale']]['have_tax'] = $list[$v['sale']]['debt'] = $list[$v['sale']]['cost_total'] = $list[$v['sale']]['total'] = $list[$v['sale']]['tax_total'] = 0;
+
+            $list[$v['sale']]['total'] += ($v['total']+$v['tax_total']);
+            $list[$v['sale']]['tax_total'] += $v['tax_total'];
+            if($v['tax'] > 0)
+                $list[$v['sale']]['have_tax'] += $v['total'];
+            $list[$v['sale']]['cost_total'] += $v['cost'];
+
+            $orderIds[$v['id']] = $v['sale'];
+
+        }
+        //退换货总额
+        $returnCondition = str_replace('`time`', '`r`.`rtime`', $condition);
+        $sql = "SELECT
+                        SUM(CASE WHEN r.type=3 THEN r.price ELSE 0 END) as sale,
+                        SUM(CASE WHEN r.type=2 THEN r.price ELSE 0 END) as buy,
+                        SUM(CASE WHEN r.type=3 AND o.tax>0 THEN r.price ELSE 0 END) as taxsale,
+                        SUM(CASE WHEN r.type=2 AND o.tax>0 THEN r.price ELSE 0 END) as taxbuy
+                    FROM {$prefix}return r
+                    LEFT JOIN {$prefix}order o ON o.`num`=r.`num`
+                    WHERE {$returnCondition} AND r.`audit` >= 1";
+        $swap = D() -> query($sql);
+
+        //退货统计
+        $sql = "SELECT
+                    SUM(r.`price`) as price,
+                    SUM(r.`cost`) as costtotal,
+                    SUM(CASE WHEN o.tax>0 THEN r.`price` ELSE 0 END) as taxprice,
+                    SUM(CASE WHEN o.tax>0 THEN o.`tax_total` ELSE 0 END) as taxTotal,
+                    r.`uid`
+                FROM {$prefix}return r
+                LEFT JOIN {$prefix}order o ON r.`num`=o.`num`
+                WHERE {$returnCondition} AND r.`audit`>=1 AND r.`type`=3
+                GROUP BY r.uid";
+        $_swap = D("Return") -> query($sql); //"SELECT SUM(`price`) as price, uid FROM {$prefix}return WHERE {$condition} AND `type`=3 GROUP BY uid");
+        foreach($_swap as $val)
+        {
+            $list[$val['uid']]['return'] = $val['price'];
+            $list[$val['uid']]['cost_return'] = $val['costtotal'];
+            $list[$val['uid']]['taxReturn'] = $val['taxprice'];
+            $list[$val['uid']]['taxTotal'] = $val['taxTotal'];
+        }
+
+        //应收
+        $debtList = D() -> query("SELECT `order`, `money` FROM {$prefix}debt WHERE `come`='order' AND `money`>0");// AND `order` IN (". implode(',', array_keys($orderIds)) .")
+        foreach ($debtList as $val)
+        {
+            $list[$orderIds[$val['order']]]['debt'] += $val['money'];
+        }
+
+        //应收应付
+        $debtCondition = str_replace('`time`', '`o`.`time`', $condition);
+        $sql = "SELECT
+                    SUM(CASE WHEN d.`money`>0 THEN d.`money` ELSE 0 END) as income,
+                    SUM(CASE WHEN d.`money`<0 THEN d.`money` ELSE 0 END) as pay
+                FROM {$prefix}debt d
+                LEFT JOIN {$prefix}order o ON d.order=o.id
+                WHERE {$debtCondition} AND d.`come`='order' AND o.type IN (2, 3) AND o.`audit`>0";
+        $debt = D() -> query($sql);
+        //统计销售内的维修总额
+        $service = D("Service") -> field("id, uid, total, tax_total, cost, sort1") -> where($condition ." AND `audit`>'0'") -> order("`id` desc") -> findAll();
+        $orderIds = array();
+        $serviceTotal = $serviceDebt = $taxService = 0;
+
+        //维修人员 对应关系
+        $_servicer = D("System_config") -> where("`name`='service1'") -> findAll();
+        $servicer = array();
+        foreach($_servicer as $val)
+        {
+            $servicer[$val['id']] = $val['value'];
+        }
+
+        foreach ($service as $v)
+        {
+            $uid = $servicer[$v['sort1']];//不知道为何这样写，这个uid根本对不起来,后来知道原来是因为需要和维修人挂靠
+            //$uid = $v['uid'];
+            $list[$uid]['service'] += ($v['total']+$v['tax_total']);
+            if($v['tax_total'] > 0)
+                $list[$uid]['haveTaxService'] += ($v['total']+$v['tax_total']);
+            $list[$uid]['cost_service'] += $v['cost'];
+
+            $orderIds[$v['id']] = $uid;
+            $serviceTotal += ($v['total']+$v['tax_total']);
+            if($v['tax_total'] > 0)
+                $taxService += ($v['total']+$v['tax_total']);
+        }
+
+        $debtList = D() -> query("SELECT `order`, `money` FROM {$prefix}debt WHERE `come`='service' AND `money`<>0 AND `order` IN (". implode(',', array_keys($orderIds)) .")");
+        foreach ($debtList as $val)
+        {
+            $list[$orderIds[$val['order']]]['debt_service'] += $val['money'];
+            $serviceDebt += $val['money'];
+        }
+
+        //费用合计
+        $daily = D("Expenses") -> query("SELECT SUM(`total`) as total, user FROM {$prefix}expenses WHERE {$condition} AND `type`='daily' GROUP BY user");
+        foreach ($daily as $val)
+            $list[$val['user']]['daily'] = $val['total'];
+
+        //员工费用 取上个月的
+        //$_stime = mktime(0, 0, 0, date('m', $stime)-1, date('d', $stime), date('Y', $stime));
+        //$_etime = mktime(0, 0, 0, date('m', $etime)-1, date('d', $etime), date('Y', $etime));
+        //$condition = str_replace(array($stime, $etime), array($_stime, $_etime), $condition);
+        $worker = D("Expenses") -> query("SELECT SUM(`total`) as total, user FROM {$prefix}expenses WHERE {$condition} AND `type`='worker' GROUP BY user");
+        foreach ($worker as $val)
+            $list[$val['user']]['worker'] = $val['total'];
+        $users = D("User") -> where("1 OR `uid`>17") -> findAll();
+        $saleCost = $serviceCost = 0;
+        foreach ($users as $vo){
+            //过滤没有数据的人员
+            if(!($list[$vo['uid']]['total'] || $list[$vo['uid']]['return'] || $list[$vo['uid']]['service'] || $list[$vo['uid']]['tax_total'] || $list[$vo['uid']]['debt'] || $list[$vo['uid']]['debt_service']  || $list[$vo['uid']]['taxReturn'] || $list[$vo['uid']]['have_tax'] || $list[$vo['uid']]['cost_total'] || $list[$vo['uid']]['cost_return'] || $list[$vo['uid']]['cost'] || $list[$vo['uid']]['cost_service'] || $list[$vo['uid']]['daily'] || $list[$vo['uid']]['worker'])) continue;
+            $saleCost += ($list[$vo['uid']]['cost_total']-$list[$vo['uid']]['cost_return']);
+            $serviceCost += ($list[$vo['uid']]['cost_service']);
+        }
+
+        $balance += $order[0]['pay']+$order[0]['taxpay']-$swap[0]['buy'] +$swap[0]['sale']- $saleCost - $serviceCost;
+        return $balance;
+    }
+
     //利润统计
     public function profit()
     {    
@@ -28,6 +182,8 @@ class FinancialAction extends Action
 
         $etime = $etime ?: NOW;
         $stime = $stime ?: ($etime - 86400 * 30);
+//        $etime = 1402675199;
+//        $stime = 1402588800;
         if($stime)
         {
             if(!$etime) $etime = NOW;
@@ -185,7 +341,6 @@ class FinancialAction extends Action
         //所有的员工
         $users = D("User") -> where("1 OR `uid`>17") -> findAll();
         $this -> assign('users', $users);
-
         //库存结余计算
         //type=2是购买，type=3是卖出
         //期初库存 + 本月购买 - 本月销售 - 本月售后
@@ -211,8 +366,8 @@ class FinancialAction extends Action
         $startServ = D() -> query($sql);
         //购买 + 购买税额 - 购买退货 - 销售 - 销售税额 + 销售退货 - 售后
         //$_stockRemain = abs($startOrder[0]['payTotal']) + abs($startOrder[0]['taxPayTotal']) - abs($startReturn[0]['payTotal']) - abs($startOrder[0]['incomeTotal']) - abs($startOrder[0]['taxIncomeTotal']) + abs($startReturn[0]['incomeTotal']) - abs($startServ[0]['serviceTotal']);
-        $_stockRemain = ($startOrder[0]['payTotal']) + ($startOrder[0]['taxPayTotal']) - ($startReturn[0]['payTotal']) - ($startOrder[0]['incomeTotal']) + ($startReturn[0]['incomeTotal']) - ($startServ[0]['serviceTotal']);
-        $_stockRemain += 127827.74 * 100; //默认加上了上一次的期初结余
+//        $_stockRemain = ($startOrder[0]['payTotal']) + ($startOrder[0]['taxPayTotal']) - ($startReturn[0]['payTotal']) - ($startOrder[0]['incomeTotal']) - ($startOrder[0]['taxIncomeTotal']) + ($startReturn[0]['incomeTotal']) - ($startServ[0]['serviceTotal']);
+        $_stockRemain = $this->calBalance($stime); //默认加上了上一次的期初结余
         $this -> assign('_stockRemain', $_stockRemain);
 //var_dump($order[0]['pay']);exit;
         //库存结余(未去除销售和维修成本)
