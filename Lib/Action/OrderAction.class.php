@@ -823,7 +823,8 @@ class OrderAction extends Action
         }
 
         $data['coststock'] = unserialize($data['coststock']);
- var_dump($data['coststock'][10][5]);die;
+//        var_dump($data['goods']);
+// var_dump($data['coststock'][10][5]);die;
         //需要入账
         if($this -> price)
         {
@@ -883,7 +884,7 @@ class OrderAction extends Action
                     }
                 }
             }
-            var_dump($data);
+//            var_dump($data['coststock'][10][5]);die;
             $this -> assign('goods' ,$data['goods']);
 
             //财务入账
