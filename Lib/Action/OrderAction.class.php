@@ -145,7 +145,9 @@ class OrderAction extends Action
                 break;
 
             //$_stockInfo = D("Stock_info") -> where("`stock` = '{$_newBuy['id']}'") -> sum("`num`");
-            $stockInfo = D("Stock_info") -> sum("`stock` = '{$_newBuy['id']}'", 'num');
+            // TODO
+//            $stockInfo = D("Stock_info") -> sum("`stock` = '{$_newBuy['id']}'", 'num');
+            $stockInfo = 0;
             /*
             if(($_newBuy['num'] + $_stockInfo['num']) <= 0)
                 break;
