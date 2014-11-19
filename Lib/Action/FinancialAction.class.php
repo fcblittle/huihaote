@@ -399,7 +399,7 @@ class FinancialAction extends Action
         if(isset($_GET['stime']) && $_GET['stime'] && isset($_GET['etime']) && $_GET['etime'])
         {
             $stime = strtotime($_GET['stime']);
-            $etime = strtotime($_GET['etime']);
+            $etime = strtotime($_GET['etime']." 23:59:59");
 
             $condition .= " AND (`time`>=$stime AND `time`<{$etime})";
         }
@@ -2205,7 +2205,7 @@ class FinancialAction extends Action
         if(isset($_GET['stime']) && $_GET['stime'] && isset($_GET['etime']) && $_GET['etime'])
         {
             $stime = strtotime($_GET['stime']);
-            $etime = strtotime($_GET['etime']);
+            $etime = strtotime($_GET['etime']." 23:59:59");
 
             $condition .= " AND (`time`>=$stime AND `time`<{$etime})";
         }
@@ -2321,7 +2321,7 @@ class FinancialAction extends Action
         if(isset($_GET['stime']) && $_GET['stime'] && isset($_GET['etime']) && $_GET['etime'])
         {
             $stime = strtotime($_GET['stime']);
-            $etime = strtotime($_GET['etime']);
+            $etime = strtotime($_GET['etime']." 23:59:59");
 
             $condition .= " AND (`time`>=$stime AND `time`<{$etime})";
         }
