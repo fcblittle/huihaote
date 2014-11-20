@@ -117,7 +117,7 @@ function audit(id)
 {
 var money = $("#money").val();
 var mType = $("#mType").val();
-
+//        alert('/index.php/Stock/audit/id/'+id+'/money/'+money+'/mType/'+mType);
 location.href='/index.php/Stock/audit/id/'+id+'/money/'+money+'/mType/'+mType;
 }
 </script>

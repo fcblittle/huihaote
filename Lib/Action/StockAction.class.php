@@ -538,6 +538,9 @@ class StockAction extends Action
         if($this -> get('can_manage') == 0)
             $this -> success('对不起，您无权管理该仓库库存。', 3);
 
+
+        $order = D(ucfirst($data['come'])) -> where("`id`={$data['order']}") -> find();
+
         //默认 账目已清
         $auditData['audit'] = Session::get('uid');
         $auditData['mType'] = $data['num'] > 0 ? '实付' : '实收';

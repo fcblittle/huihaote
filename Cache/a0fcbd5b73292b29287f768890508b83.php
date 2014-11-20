@@ -72,10 +72,10 @@
 <span style="color:red">审核失败</span><?php endif; ?><?php endif; ?>
 </td>
 <td>
-&nbsp;┊&nbsp; <a href="/index.php/Sorder/view/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/url/add">查 看</a>
-<?php if(($vo['audit'])  <=  "0"): ?>&nbsp;┊&nbsp; <a href="/index.php/Sorder/edit/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/url/add">修 改</a>
-&nbsp;┊&nbsp; <a href="/index.php/Sorder/delete/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/url/add">删 除</a>
-<?php if(($vo['audit'])  !=  "0"): ?>&nbsp;┊&nbsp; <a href="/index.php/Sorder/add/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/url/add">重新提交</a><?php endif; ?><?php endif; ?>
+&nbsp;┊&nbsp; <a href="/index.php/Morder/view/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/url/add">查 看</a>
+<?php if(($vo['audit'])  <=  "0"): ?>&nbsp;┊&nbsp; <a href="/index.php/Morder/edit/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/url/add">修 改</a>
+&nbsp;┊&nbsp; <a href="/index.php/Morder/delete/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/url/add">删 除</a>
+<?php if(($vo['audit'])  !=  "0"): ?>&nbsp;┊&nbsp; <a href="/index.php/Morder/add/id/<?php echo (is_array($vo)?$vo["id"]:$vo->id); ?>/url/add">重新提交</a><?php endif; ?><?php endif; ?>
 &nbsp;┊&nbsp;
 </td>
 </tr><?php endforeach; ?><?php endif; ?><?php else: echo "" ;?><?php endif; ?>
@@ -83,7 +83,7 @@
 <td colspan="6" class="tr"><?php echo ($page); ?></td>
 </tr>
 </table>
-<input type="button" class="button" onclick="location.href='/index.php/Sorder/add/do/1'" value="添 加" /> &nbsp;
+<input type="button" class="button" onclick="location.href='/index.php/Morder/add/do/1'" value="添 加" /> &nbsp;
 
 </div>
 </div>

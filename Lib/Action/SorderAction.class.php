@@ -459,27 +459,12 @@ class SorderAction extends OrderAction
                         $num = abs($v['num']);
                         if($num)
                         {
-                            $data[] = array(
-                                'goods'     => $v['goods'],
-                                'goods_name' => $allgoods[$v['goods']]['name'],
-                                'group'     => $key,
-                                'num'       => $num,
-                                'price'     => $return_goods[$v['goods']]['price'] * $num * -1,
-                                'time'      => NOW,
-                                'uid'       => $return['uid'],
-                                'rtime'     => NOW,
-                                'comment'   => str_replace(array('单', '出'), array('', '退货入'), $this -> title) . ' ('.$return['num'].')',
-                                'order'     => $return['id'],
-                                'audit'     => 0,
-                                'come'      => 'return',
-                            );
-
-
+                            $num1 = $num;
                             //产品成本
                             $_costDetial = $costDetail[$v['goods']][$key]['detail'];
 
                             $__costDetail = array();
-                            foreach ($_costDetial as $detail) 
+                            foreach ($_costDetial as $detail)
                             {
                                 if($num == 0)
                                     break;
@@ -495,6 +480,23 @@ class SorderAction extends OrderAction
                             }
 
                             $coststock[$v['goods'] .'-'. $key] = $__costDetail;
+
+
+                            $data[] = array(
+                                'goods'     => $v['goods'],
+                                'goods_name' => $allgoods[$v['goods']]['name'],
+                                'group'     => $key,
+                                'num'       => $num1,
+                                'price'     => array_pop($__costDetail)['price'] * $num1,
+                                'time'      => NOW,
+                                'uid'       => $return['uid'],
+                                'rtime'     => NOW,
+                                'comment'   => str_replace(array('单', '出'), array('', '退货入'), $this -> title) . ' ('.$return['num'].')',
+                                'order'     => $return['id'],
+                                'audit'     => 0,
+                                'come'      => 'return',
+                            );
+
 
 
                             //检查库存
