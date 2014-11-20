@@ -165,7 +165,7 @@ class FinancialAction extends Action
             $serviceCost += ($list[$vo['uid']]['cost_service']);
         }
 
-        $balance += $order[0]['pay']+$order[0]['taxpay']-$swap[0]['buy'] +$swap[0]['sale']- $saleCost - $serviceCost;
+        $balance += $order[0]['pay']+$order[0]['taxpay']-$swap[0]['buy'] - $saleCost - $serviceCost;
         return $balance;
     }
 
@@ -372,7 +372,7 @@ class FinancialAction extends Action
 //var_dump($order[0]['pay']);exit;
         //库存结余(未去除销售和维修成本)
         /*2014-6-23新加减去销售*/
-        $stockRemain = $_stockRemain + ($order[0]['pay']+$order[0]['taxpay']-$swap[0]['buy']+$swap[0]['sale']) ;
+        $stockRemain = $_stockRemain + ($order[0]['pay']+$order[0]['taxpay']-$swap[0]['buy']) ;
         //$stockRemain = $_stockRemain + abs($order[0]['pay']+$order[0]['taxpay']-$swap[0]['buy']) - abs($order[0]['income']+$order[0]['taxincome']-$swap[0]['sale']);
         $this -> assign('stockRemain', $stockRemain);
         

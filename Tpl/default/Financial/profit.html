@@ -352,9 +352,9 @@
             时间段内购买
             (
                 <?php if(($order['pay']+$order['taxpay']-$swap['buy']) < 0){?>
-                    <span style="color:red;">-<{$order['pay']+$order['taxpay']-$swap['buy']+$swap['sale']|showPrice}></span>
+                    <span style="color:red;">-<{$order['pay']+$order['taxpay']-$swap['buy']|showPrice}></span>
                 <?php }else{ ?>
-                    <span style="color:green;"><{$order['pay']+$order['taxpay']-$swap['buy']+$swap['sale']|showPrice}></span>
+                    <span style="color:green;"><{$order['pay']+$order['taxpay']-$swap['buy']|showPrice}></span>
                 <?php } ?>
             ) - 
             时间段内销售成本
