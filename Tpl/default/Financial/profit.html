@@ -372,11 +372,19 @@
                 <?php }else{ ?>
                     <span style="color:green;"><{$serviceCost|showPrice}></span>
                 <?php } ?>
-            ) =  
+            ) +
+            时间段内报溢
+            (
+                <span style="color:green;"><{$overflow|showPrice}></span>
+            ) -
+            时间段内报损
+            (
+                <span style="color:green;"><{$loss|showPrice}></span>
+            ) =
             <?php if(($stockRemain - $saleCost - $serviceCost) < 0){?>
-                <span style="color:red;">-<{$stockRemain - $saleCost-$serviceCost|showPrice}></span>
+                <span style="color:red;">-<{$stockRemain - $saleCost-$serviceCost+$overflow-$loss|showPrice}></span>
             <?php }else{ ?>
-                <span style="color:green;"><{$stockRemain - $saleCost-$serviceCost|showPrice}></span>
+                <span style="color:green;"><{$stockRemain - $saleCost-$serviceCost+$overflow-$loss|showPrice}></span>
             <?php } ?>
         </td>
     </tr>

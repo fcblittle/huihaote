@@ -420,11 +420,19 @@ if($total < 0){
 <?php }else{ ?>
 <span style="color:green;"><?php echo (showPrice($serviceCost)); ?></span>
 <?php } ?>
-) =  
+) +
+时间段内报溢
+(
+<span style="color:green;"><?php echo (showPrice($overflow)); ?></span>
+) -
+时间段内报损
+(
+<span style="color:green;"><?php echo (showPrice($loss)); ?></span>
+) =
 <?php if(($stockRemain - $saleCost - $serviceCost) < 0){?>
-<span style="color:red;">-<?php echo (showPrice($stockRemain - $saleCost-$serviceCost)); ?></span>
+<span style="color:red;">-<?php echo (showPrice($stockRemain - $saleCost-$serviceCost+$overflow-$loss)); ?></span>
 <?php }else{ ?>
-<span style="color:green;"><?php echo (showPrice($stockRemain - $saleCost-$serviceCost)); ?></span>
+<span style="color:green;"><?php echo (showPrice($stockRemain - $saleCost-$serviceCost+$overflow-$loss)); ?></span>
 <?php } ?>
 </td>
 </tr>

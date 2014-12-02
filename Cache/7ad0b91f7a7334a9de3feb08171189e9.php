@@ -53,7 +53,7 @@
 <script type="text/javascript" src="/./Tpl/default/Public/JS/datebox.js"></script>
 
 <form action="/index.php/Stock/report" method="post">
-<table cellpadding="2" cellspacing="1" border="0" style="width:500px;">
+<table id="mytable" cellpadding="2" cellspacing="1" border="0" style="width:500px;">
 <tr>
 <th colspan="2"><?php if(($type)  ==  "in"): ?>报溢<?php else: ?>报损<?php endif; ?>信息</th>
 </tr>
@@ -78,7 +78,7 @@
 <tr>
 <td>报溢报损</td>
 <td class="tf">
-<select name="type">
+<select name="type" id="type">
 <option value="in">报溢</option>
 <option value="de">报损</option>
 </select>
@@ -92,8 +92,8 @@
 <td>数　量<em>*</em></td>
 <td class="tf"><input type="text" style="width:200px;" name="num" onkeyup="changenum(this);" /> <span id="unit"><?php echo ($g['unit']); ?></span></td>
 </tr>
-<!--
-<tr>
+
+<tr id="totalValue">
 <td>总 价 值<em>*</em></td>
 <td class="tf">
 <input type="text" style="width:200px;" id="price" name="price" /> <a href="javascript:showCalculator();">>计算器</a>
@@ -102,7 +102,7 @@
 </div>
 </td>
 </tr>
--->
+
 </table>
 <!--<input type="hidden" name="type" value="<?php echo ($type); ?>" />-->
 <input type="submit" class="button" value="保 存" />
@@ -125,6 +125,13 @@ $("#goods").change(function(){
 $("#unit").html($(this).children("option:selected").attr("key"));
 $("#cprice").val($(this).children("option:selected").attr("title"));
 $("#goods_name").val($(this).children("option:selected").html());
+});
+$('#type').change(function(){
+if($("#type").val()=='de') {
+$('#totalValue').hide();
+} else {
+$("#totalValue").show();
+}
 });
 $(".remain").change(function(){
 var goods = $("#goods").val();

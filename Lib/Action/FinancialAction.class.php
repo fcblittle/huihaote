@@ -20,12 +20,21 @@ class FinancialAction extends Action
     {
         $balance = 127827.74 * 100;
 
-        // 仓库结余=期初结余  + 时间段内购买  - 时间段内销售成本  - 时间段内维修成本
+        // 仓库结余=期初结余  + 时间段内购买  - 时间段内销售成本  - 时间段内维修成本  +时间段内报溢  -时间段内报损
 
         $condition = '1';
         $condition .= ' AND `time` < '.$stime;
 
         $prefix = C("DB_PREFIX");
+
+        $sql = "SELECT
+                        SUM(CASE WHEN `num`<0 THEN ABS(`price`) ELSE 0 END) AS loss,
+                        SUM(CASE WHEN `num`>0 THEN ABS(`price`) ELSE 0 END) AS overflow
+                    FROM {$prefix}stock
+                    WHERE {$condition} AND `audit`>0 AND `order`=0";
+        $flow = D() -> query($sql);
+        $loss = $flow[0]['loss'];
+        $overflow = $flow[0]['overflow'];
         //销售/采购统计
         $sql = "SELECT
                         SUM(CASE WHEN type=3 THEN total ELSE 0 END) as income,
@@ -165,7 +174,7 @@ class FinancialAction extends Action
             $serviceCost += ($list[$vo['uid']]['cost_service']);
         }
 
-        $balance += $order[0]['pay']+$order[0]['taxpay']-$swap[0]['buy'] - $saleCost - $serviceCost;
+        $balance += $order[0]['pay']+$order[0]['taxpay']-$swap[0]['buy'] - $saleCost - $serviceCost + $overflow - $loss;
         return $balance;
     }
 
@@ -193,6 +202,18 @@ class FinancialAction extends Action
         $this -> assign('etime', $etime ? date("Y-m-d", $etime) : '');
 
         $prefix = C("DB_PREFIX");
+
+        $sql = "SELECT
+                        SUM(CASE WHEN `num`<0 THEN ABS(`price`) ELSE 0 END) AS loss,
+                        SUM(CASE WHEN `num`>0 THEN ABS(`price`) ELSE 0 END) AS overflow
+                    FROM {$prefix}stock
+                    WHERE {$condition} AND `audit`>0 AND `order`=0";
+        $flow = D() -> query($sql);
+        $loss = $flow[0]['loss'];
+        $overflow = $flow[0]['overflow'];
+
+        $this -> assign('loss', $loss);
+        $this -> assign('overflow', $overflow);
 
         //销售/采购统计
         $sql = "SELECT 
