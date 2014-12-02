@@ -1331,7 +1331,7 @@ class StockAction extends Action
                 'group'     => $_POST['group'],
                 'num'       => $_POST['type'] == 'in' ? abs($_POST['num']) : -abs($_POST['num']),
                 //'price'     => inputPrice($_POST['price']),
-                'price'     => 0,
+                'price'     => abs($_POST['price'])*100,
                 'time'      => strtotime(date('Y-m-d')),
                 'uid'       => Session::get('uid'),
                 'rtime'     => NOW,
@@ -1361,6 +1361,11 @@ class StockAction extends Action
                 $cost = A("Order")->productCost($data['goods'],abs($data['num']),$data['group']);
                 $info = $cost['info'];
                 $DB_Stock->startTrans();
+
+                foreach($info as $v) {
+                    $data['price'] += $v['num']*$v['price'];
+                }
+
                 if($id = $DB_Stock -> add($data))
                 {
 
