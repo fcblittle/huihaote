@@ -12,6 +12,7 @@
             <td class="tf">
                 <input type="hidden" name="goods_name" id="goods_name" value="<{$g['name']}>" />
                 货物类型：<select name="goods_type" class="goods_type"></select>
+                <br/>
                 货 品：<select name="goods" class="goods" id="goods"></select>
             </td>
         </tr>
@@ -90,7 +91,7 @@ $(document).ready(function(){
                 obj.nextAll(".goods").append("<option key='' value=''>请选择...</option>");
                 for(x in data.data.list){
                     var t = data.data.list[x];
-                    obj.next(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+                    obj.nextAll(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
                 }
             }else{
                 alert("查询失败，请重试！");
