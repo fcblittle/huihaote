@@ -11,12 +11,8 @@
             <td width="100">产　品<em>*</em></td>
             <td class="tf">
                 <input type="hidden" name="goods_name" id="goods_name" value="<{$g['name']}>" />
-                <select name="goods" id="goods" class="remain">
-                        <option value="">请选择...</option>
-                    <volist name="allgoods" id="vo">
-                        <option value="<{$vo['id']}>" key="<{$vo['unit']}>" title="<{$vo['price']/100}>" <eq name="vo['id']" value="$goods">selected="selected"</eq> ><{$vo['name']}>(<{$vo['model']}>)</option>
-                    </volist>
-                </select>
+                货物类型：<select name="goods_type" class="goods_type"></select>
+                货 品：<select name="goods" class="goods" id="goods"></select>
             </td>
         </tr>
         <tr>
@@ -65,21 +61,77 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
-    var goods = $("#goods").val();
-    var group = $("#group").val();
-    ajax("__URL__/remain", {goods:goods,group:group}, 'post', function(data){
+    ajax("__APP__/Goods/index", {type:1}, 'post', function(data){
         if(data.status){
-            $(".remaintotal").text(data.data+"个");
+            var select = '';
+            for(x in data.data.type){
+                var t = data.data.type[x];
+                select = (t.id == '<?php echo (int)$_GET['goods_type']; ?>') ? 'selected="selected"' : '';
+                $(".goods_type").append("<option value='"+t.id+"' "+select+">"+t.levelstr+t.name+"</option>");
+            }
+            $(".goods").append("<option value=''>请选择...</option>");
+            var type = '<?php echo (int)$_GET['goods_type']; ?>';
+            for(x in data.data.list){
+                var t = data.data.list[x];
+                select = (t.id == '<?php echo (int)$_GET['goods']; ?>') ? 'selected="selected"' : '';
+                if(type && t.type == type)
+                    $(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"' "+select+">"+t.name+'('+t.model+')'+"</option>");
+            }
         }else{
             alert("查询失败，请重试！");
         }
-    });  
-    
-    $("#goods").change(function(){
-        $("#unit").html($(this).children("option:selected").attr("key"));
-        $("#cprice").val($(this).children("option:selected").attr("title"));
-        $("#goods_name").val($(this).children("option:selected").html());
     });
+
+    $(".goods_type").change(function(){
+        var obj = $(this);
+        ajax("__APP__/Goods/index/type/"+$(this).val(), {type:$(this).val()}, 'post', function(data){
+            if(data.status){
+                obj.nextAll(".goods").html("");
+                obj.nextAll(".goods").append("<option key='' value=''>请选择...</option>");
+                for(x in data.data.list){
+                    var t = data.data.list[x];
+                    obj.next(".goods").append("<option key='"+t.unit+"' title='"+(t.price/100)+"' value='"+t.id+"'>"+t.name+'('+t.model+')'+"</option>");
+                }
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+    $(".goods").change(function(){
+        $(this).siblings(".unit").html($(this).children("option:selected").attr("key"));
+        $(this).siblings(".cprice").val($(this).children("option:selected").attr("title"));
+        $(this).siblings(".goods_name").val($(this).children("option:selected").html());
+        ajax("__URL__/remain", {goods:$(this).val(),group:$("#group").val()}, 'post', function(data){
+            if(data.status){
+                $(".remaintotal").text(data.data+"个");
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+
+    $(".remain").change(function(){
+        ajax("__URL__/remain", {goods:$("#goods").val(),group:$(this).val()}, 'post', function(data){
+            if(data.status){
+                $(".remaintotal").text(data.data+"个");
+            }else{
+                alert("查询失败，请重试！");
+            }
+        });
+    });
+//
+//    var goods = $("#goods").val();
+//    var group = $("#group").val();
+//    ajax("__URL__/remain", {goods:goods,group:group}, 'post', function(data){
+//        if(data.status){
+//            $(".remaintotal").text(data.data+"个");
+//        }else{
+//            alert("查询失败，请重试！");
+//        }
+//    });
+    
+
     $('#type').change(function(){
         if($("#type").val()=='de') {
             $('#totalValue').hide();
@@ -87,17 +139,17 @@ $(document).ready(function(){
             $("#totalValue").show();
         }
     });
-    $(".remain").change(function(){
-        var goods = $("#goods").val();
-        var group = $("#group").val();
-        ajax("__URL__/remain", {goods:goods,group:group}, 'post', function(data){
-            if(data.status){
-                $(".remaintotal").text(data.data+"个");
-            }else{
-                alert("查询失败，请重试！");
-            }
-        });  
-    });
+//    $(".remain").change(function(){
+//        var goods = $("#goods").val();
+//        var group = $("#group").val();
+//        ajax("__URL__/remain", {goods:goods,group:group}, 'post', function(data){
+//            if(data.status){
+//                $(".remaintotal").text(data.data+"个");
+//            }else{
+//                alert("查询失败，请重试！");
+//            }
+//        });
+//    });
 });
 function showCalculator(){
     $("#calculator").toggle();

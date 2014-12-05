@@ -330,15 +330,15 @@
                 <?php }else{ ?>
                     <{$order['pay']+$order['taxpay']-$swap['buy']|showPrice}>
                 <?php } ?>
-            ) - 
-            费用总计
+            ) +
+            日常费用
             (
                 <?php if($dailyTotal < 0){?>
                     -<{$dailyTotal|showPrice}>
                 <?php }else{ ?>
                     <{$dailyTotal|showPrice}>
                 <?php } ?>
-            ) - 
+            ) +
             员工费用
             (
                 <?php if($workerTotal < 0){?>
@@ -348,7 +348,7 @@
                 <?php } ?>
             ) = 
             <?php 
-                $total = ($order['income']+$order['taxincome']-$swap['sale']) + ($serviceTotal) - ($order['pay']+$order['taxpay']-$swap['buy']) - $dailyTotal - $workerTotal; 
+                $total = ($order['income']+$order['taxincome']-$swap['sale']) + ($serviceTotal) - ($order['pay']+$order['taxpay']-$swap['buy']) + $dailyTotal + $workerTotal;
                 if($total < 0){
             ?>
                 -<{$total|showPrice}>
