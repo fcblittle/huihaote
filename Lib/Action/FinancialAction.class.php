@@ -190,7 +190,7 @@ class FinancialAction extends Action
             $etime = strtotime($_GET['etime'].' 23:59:59');
 
         $etime = $etime ?: NOW;
-        $stime = $stime ?: ($etime - 86400 * 30);
+        $stime = $stime ?: mktime(0, 0, 0, date('n', NOW), date('j', NOW)-30, date('Y', NOW));
 //        $etime = 1402675199;
 //        $stime = 1402588800;
         if($stime)
