@@ -18,7 +18,7 @@ class FinancialAction extends Action
 
     private function calBalance($stime = 0)
     {
-        $balance = 127827.74 * 100;
+        $balance = 37359.96 * 100;
 
         // 仓库结余=期初结余  + 时间段内购买  - 时间段内销售成本  - 时间段内维修成本  +时间段内报溢  -时间段内报损
 
