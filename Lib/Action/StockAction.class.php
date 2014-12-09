@@ -349,11 +349,17 @@ class StockAction extends Action
             if(!$_POST['num'] || !$_POST['time'])
                 $this -> success('必填信息不完整，请重试！', 3);
 
+            $condition = "`id`='{$id}'";
+            $DB_Stock = D('Stock');
+            $data1 = $DB_Stock->find($condition);
+
+
             $data = array(
                 'id'        => $id,
                 'group'     => $_POST['group'],
                 'num'       => $_POST['num'],
                 'price'     => inputPrice($_POST['price']) * ($_POST['num']>0 ? -1 : 1),
+                'mprice'    => $data1['mprice'],
                 'time'      => strtotime($_POST['time']),
                 'uid'       => Session::get('uid'),
                 'rtime'     => NOW,
@@ -363,7 +369,12 @@ class StockAction extends Action
             );
 
             //添加/修改应收应付
-            $leftMoney = $data['price'] - $data['money'];
+            if($data['mprice'] == 0){
+                $leftMoney = $data['price'] - $data['money'];
+            }else{
+                $leftMoney = $data['mprice'] - $data['money'];
+            }
+
 
             $DB_Stock = D('stock');
             if($DB_Stock -> save($data))
@@ -406,6 +417,11 @@ class StockAction extends Action
         $DB_Stock -> link('goods', 'HAS_ONE', 'goods', 'goods', 'id');
         $data = $DB_Stock -> xfind($condition);
         $this -> assign($data);
+
+        $DB_Stock = D('Stock');
+        $data1 = $DB_Stock->find($condition);
+        $mprice = $data1['mprice'];
+        $this -> assign('mprice', $mprice);
 
         //判断权限
         $this -> group($data['group']);

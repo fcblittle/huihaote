@@ -27,12 +27,19 @@
     </tr>
     <!--以前注释了，现在修改过来了-->
     <tr>
-        <td>总 价 值<em>*</em></td>
+        <td>成 本 价 值<em>*</em></td>
         <td class="tf">
             <input type="text" style="width:200px;" id="price" value="<{$price|showPrice}>" name="price" /> <a href="javascript:showCalculator();">>计算器</a>
             <div id="calculator" style="background:#EEE; padding:10px; margin:10px; display:none;">
                 <input type="text" id="cprice" style="width:50px;" />（单价） * <input id="cnum" type="text" readonly="readonly" style="width:50px;" value="<{$num}>" />（数量） <input type="button" value="计算" onclick="calculator()" />
             </div>
+        </td>
+    </tr>
+    <tr>
+        <td>总 价 值<em>*</em></td>
+        <td class="tf">
+            <input type="text" style="width:200px;" id="mprice" value="<{$mprice|showPrice}>" name="mprice" />
+            如果为零请参照成本价值！
         </td>
     </tr>
     <if condition="$order">

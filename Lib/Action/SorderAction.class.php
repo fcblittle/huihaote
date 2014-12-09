@@ -488,6 +488,7 @@ class SorderAction extends OrderAction
                                 'group'     => $key,
                                 'num'       => $num1,
                                 'price'     => array_pop($__costDetail)['price'] * $num1,
+                                'mprice'    => $return_goods[$v['goods']]['price'] * $num1 * -1,
                                 'time'      => NOW,
                                 'uid'       => $return['uid'],
                                 'rtime'     => NOW,
